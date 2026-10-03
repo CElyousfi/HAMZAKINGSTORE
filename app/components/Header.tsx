@@ -11,6 +11,7 @@ import {
   type NavItem,
 } from '~/lib/navigation';
 import {useWishlist} from '~/lib/ui';
+import {BrandLogo} from './BrandLogo';
 import {
   IconBag,
   IconHeart,
@@ -19,7 +20,6 @@ import {
   IconUser,
   IconArrow,
   IconWhatsApp,
-  Monogram,
 } from './Icons';
 
 type Img = {
@@ -90,8 +90,12 @@ export function Header({cart, menuImages}: HeaderProps) {
               className="wordmark"
               aria-label={BRAND.name}
             >
-              <Monogram />
-              <span className="wordmark-text">{BRAND.name}</span>
+              <BrandLogo
+                variant="lockup"
+                height={34}
+                eager
+                className="wordmark-logo"
+              />
             </Link>
           </div>
 

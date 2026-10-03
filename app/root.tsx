@@ -11,7 +11,6 @@ import {
   useRouteLoaderData,
 } from 'react-router';
 import type {Route} from './+types/root';
-import favicon from '~/assets/favicon.svg';
 import {
   FOOTER_QUERY,
   HEADER_QUERY,
@@ -24,6 +23,7 @@ import {SITE} from './lib/content';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
+import {BrandLogo} from './components/BrandLogo';
 import {MetaPixel} from './components/MetaPixel';
 import fontStyles from '~/styles/fonts.css?url';
 
@@ -71,7 +71,10 @@ export function links() {
       rel: 'preconnect',
       href: 'https://shop.app',
     },
-    {rel: 'icon', type: 'image/svg+xml', href: favicon},
+    {rel: 'icon', href: '/favicon.ico', sizes: 'any'},
+    {rel: 'icon', type: 'image/png', sizes: '32x32', href: '/favicon-32.png'},
+    {rel: 'apple-touch-icon', href: '/apple-touch-icon.png'},
+    {rel: 'manifest', href: '/site.webmanifest'},
   ];
 }
 
@@ -97,6 +100,7 @@ export async function loader(args: Route.LoaderArgs) {
     ...deferredData,
     ...criticalData,
     publicStoreDomain: env.PUBLIC_STORE_DOMAIN,
+    origin: new URL(args.request.url).origin,
     metaPixelId: env.PUBLIC_META_PIXEL_ID,
     shop: getShopAnalytics({
       storefront,
@@ -212,6 +216,7 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
+        <DefaultSocialTags />
         <script
           nonce={nonce}
           suppressHydrationWarning
@@ -226,6 +231,20 @@ export function Layout({children}: {children?: React.ReactNode}) {
         <Scripts nonce={nonce} />
       </body>
     </html>
+  );
+}
+
+/** Fallback share image for pages that don't set their own (Meta takes the first og:image). */
+function DefaultSocialTags() {
+  const data = useRouteLoaderData<RootLoader>('root');
+  const origin = data?.origin ?? SITE.url;
+  return (
+    <>
+      <meta property="og:image" content={`${origin}/brand/og-image.jpg`} />
+      <meta property="og:image:width" content="1200" />
+      <meta property="og:image:height" content="630" />
+      <meta name="twitter:image" content={`${origin}/brand/og-image.jpg`} />
+    </>
   );
 }
 
@@ -267,6 +286,11 @@ export function ErrorBoundary() {
 
   return (
     <div className="route-error">
+      <BrandLogo
+        variant="crown-wordmark"
+        height={56}
+        className="route-error-logo"
+      />
       <p className="eyebrow">Erreur {errorStatus}</p>
       <h1 className="display-l">
         {errorStatus === 404 ? 'Page introuvable.' : 'Oups, un faux pas.'}

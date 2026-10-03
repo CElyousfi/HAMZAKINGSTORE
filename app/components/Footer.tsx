@@ -2,7 +2,8 @@ import {Link} from 'react-router';
 import type {FooterQuery, HeaderQuery} from 'storefrontapi.generated';
 import {BRAND, SHIPPING} from '~/lib/config';
 import {FOOTER_COLUMNS} from '~/lib/navigation';
-import {IconCash, IconReturn, IconShield, IconTruck, Monogram} from './Icons';
+import {IconCash, IconReturn, IconShield, IconTruck} from './Icons';
+import {BrandLogo} from './BrandLogo';
 
 interface FooterProps {
   footer: Promise<FooterQuery | null>;
@@ -54,7 +55,10 @@ export function Footer(_props: FooterProps) {
     <footer className="footer">
       <div className="footer-top">
         <div className="footer-news">
-          <p className="eyebrow eyebrow--light">Le club</p>
+          <p className="eyebrow eyebrow--light footer-club">
+            <BrandLogo variant="crown" tone="white" height={12} decorative /> Le
+            club
+          </p>
           <h2 className="footer-news-title">Les drops avant tout le monde.</h2>
           <form
             className="news-form"
@@ -97,12 +101,12 @@ export function Footer(_props: FooterProps) {
       </div>
 
       <div className="footer-giant" aria-hidden>
-        {BRAND.name}
+        <BrandLogo variant="wordmark" tone="white" height={320} decorative />
       </div>
 
       <div className="footer-bottom">
         <div className="footer-brand">
-          <Monogram size={22} />
+          <BrandLogo variant="hk" tone="white" height={20} decorative />
           <span>
             © {year} {BRAND.legalName} — Casablanca, Maroc
           </span>

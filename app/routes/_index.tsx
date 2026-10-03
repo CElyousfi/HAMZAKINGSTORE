@@ -38,7 +38,7 @@ export const meta: Route.MetaFunction = () => {
         '@type': 'Organization',
         name: BRAND.name,
         url: SITE.url,
-        logo: `${SITE.url}/favicon.svg`,
+        logo: `${SITE.url}/brand/icon-512.png`,
         sameAs: [BRAND.instagram, BRAND.tiktok],
         address: {
           '@type': 'PostalAddress',

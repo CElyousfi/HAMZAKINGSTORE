@@ -15,6 +15,7 @@ import {
 } from '~/components/SearchFormPredictive';
 import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 import {WhatsAppFloat} from '~/components/WhatsAppButton';
+import {BrandLogo} from '~/components/BrandLogo';
 import {NAVIGATION} from '~/lib/navigation';
 import {BRANDS, whatsappLink} from '~/lib/config';
 import {ICON_MODELS} from '~/lib/content';
@@ -259,7 +260,12 @@ function MobileMenuAside() {
   return (
     <Aside
       type="mobile"
-      heading="Menu"
+      heading={
+        <>
+          <BrandLogo variant="lockup" height={24} />
+          <span className="sr-only">Menu</span>
+        </>
+      }
       side="left"
       footer={
         <div className="mnav-foot">

@@ -4,6 +4,7 @@ import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 import {BRAND, SHIPPING, whatsappLink} from '~/lib/config';
 import {DELIVERY_ROWS, FAQ, PAGES, SITE} from '~/lib/content';
 import {SizeTable} from '~/components/SizeGuide';
+import {BrandLogo} from '~/components/BrandLogo';
 import {
   IconArrow,
   IconChevron,
@@ -54,6 +55,13 @@ export default function Page() {
           <span>/</span>
           <span aria-current="page">{title}</span>
         </nav>
+        {handle === 'a-propos' || handle === 'authenticite' ? (
+          <BrandLogo
+            variant="crown-wordmark"
+            height={48}
+            className="page-head-logo"
+          />
+        ) : null}
         <h1 className="display-l">{title}</h1>
         {intro ? <p className="page-intro">{intro}</p> : null}
       </header>

@@ -7,7 +7,8 @@ import {SHIPPING} from '~/lib/config';
 import {CartSummary} from './CartSummary';
 import {CartUpsell} from './CartUpsell';
 import {formatMoney} from './Price';
-import {IconArrow, IconBag} from './Icons';
+import {IconArrow} from './Icons';
+import {BrandLogo} from './BrandLogo';
 
 export type CartLayout = 'page' | 'aside';
 
@@ -126,7 +127,7 @@ function CartEmpty({layout}: {layout?: CartMainProps['layout']}) {
   return (
     <div className="cart-empty">
       <span className="cart-empty-icon">
-        <IconBag width={28} height={28} />
+        <BrandLogo variant="crown" height={22} decorative />
       </span>
       <p className="cart-empty-title">Ton panier est vide</p>
       <p className="cart-empty-copy">

@@ -2665,7 +2665,8 @@ body:has(.sticky-buy.is-visible) .wa-float {
   margin-bottom: 8px;
 }
 .cart-page {
-  padding: 40px 0 80px;
+  padding-top: 0;
+  padding-bottom: 80px;
 }
 
 /* =========================================================================
@@ -4005,8 +4006,14 @@ body:has(.consent) .wa-float {
   color: var(--ink-2);
 }
 .page-body {
-  max-width: 760px;
   padding-bottom: 96px;
+}
+.page-body > * {
+  max-width: 760px;
+}
+.sizeguide .page-body > *,
+.faq .page-body > * {
+  max-width: none;
 }
 .page-section {
   padding: 28px 0;
@@ -4917,5 +4924,85 @@ body:has(.consent) .wa-float {
 @media (max-width: 63.99em) {
   .announce-track {
     grid-column: 1;
+  }
+}
+
+/* =========================================================================
+   HAMZA KING logo system
+   ========================================================================= */
+.brand-logo-img {
+  display: block;
+  width: auto;
+  max-width: 100%;
+  user-select: none;
+}
+.wordmark {
+  flex: none;
+}
+.wordmark-logo {
+  height: 34px;
+  transition: opacity 0.2s;
+}
+.wordmark:hover .wordmark-logo {
+  opacity: 0.8;
+}
+
+/* Footer */
+.footer-club {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+.footer-club .brand-logo-img {
+  height: 12px;
+}
+.footer-giant {
+  display: flex;
+  justify-content: center;
+  padding: 24px var(--gutter) 40px;
+  -webkit-text-stroke: 0;
+}
+.footer-giant .brand-logo-img {
+  width: min(100%, 1180px);
+  height: auto;
+  opacity: 0.1;
+}
+.footer-brand .brand-logo-img {
+  height: 20px;
+}
+
+/* Empty states & pages */
+.cart-empty-icon .brand-logo-img {
+  height: 22px;
+}
+.route-error-logo {
+  height: 56px;
+  margin-bottom: 24px;
+}
+.page-head-logo {
+  height: 48px;
+  margin: 8px 0 4px;
+}
+.drawer-title .brand-logo-img {
+  height: 24px;
+}
+
+@media (max-width: 63.99em) {
+  .wordmark-logo {
+    height: 26px;
+  }
+}
+@media (max-width: 44.99em) {
+  .wordmark-logo {
+    height: 24px;
+  }
+  .route-error-logo {
+    height: 40px;
+  }
+  .page-head-logo {
+    height: 36px;
+  }
+  .footer-giant {
+    padding-bottom: 28px;
   }
 }
