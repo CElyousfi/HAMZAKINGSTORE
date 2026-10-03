@@ -232,6 +232,30 @@ function UniverseGrid({collections}: {collections: UniverseCollection[]}) {
       {CATEGORIES.map((cat) => {
         const c = collections.find((x) => x.handle === cat.handle);
         const img = c?.image ?? c?.products.nodes[0]?.featuredImage;
+        if (cat.image) {
+          return (
+            <Link
+              key={cat.handle}
+              to={`/collections/${cat.handle}`}
+              className="universe"
+            >
+              <img
+                src={cat.image}
+                alt=""
+                className="universe-img"
+                loading="lazy"
+              />
+              <span className="universe-kicker">{cat.kicker}</span>
+              <span className="universe-body">
+                <span className="universe-title">{cat.title}</span>
+                <span className="universe-copy">{cat.copy}</span>
+              </span>
+              <span className="universe-arrow">
+                <IconArrow />
+              </span>
+            </Link>
+          );
+        }
         return (
           <Link
             key={cat.handle}

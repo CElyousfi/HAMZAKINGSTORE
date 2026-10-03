@@ -3109,9 +3109,9 @@ ul.mega-col,
 
 /* Brand logos (optional, see app/lib/config.ts) */
 .ticker-logo {
-  height: 26px;
+  height: 30px;
   width: auto;
-  max-width: 140px;
+  max-width: 150px;
   object-fit: contain;
   filter: grayscale(1) brightness(0);
   opacity: 0.85;

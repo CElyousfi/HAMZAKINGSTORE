@@ -42,43 +42,56 @@ export const ANNOUNCEMENTS = [
 export type Brand = {name: string; handle: string; logo?: string};
 
 export const BRANDS: Brand[] = [
-  {name: 'Nike', handle: 'nike', logo: ''},
-  {name: 'Jordan', handle: 'jordan', logo: ''},
-  {name: 'Adidas', handle: 'adidas', logo: ''},
-  {name: 'New Balance', handle: 'new-balance', logo: ''},
-  {name: 'Asics', handle: 'asics', logo: ''},
-  {name: 'Puma', handle: 'puma', logo: ''},
-  {name: 'On', handle: 'on', logo: ''},
-  {name: 'Hoka', handle: 'hoka', logo: ''},
-  {name: 'Converse', handle: 'converse', logo: ''},
-  {name: 'Vans', handle: 'vans', logo: ''},
+  {name: 'Nike', handle: 'nike', logo: '/brands/nike.png'},
+  {name: 'Jordan', handle: 'jordan', logo: '/brands/jordan.png'},
+  {name: 'Adidas', handle: 'adidas', logo: '/brands/adidas.png'},
+  {
+    name: 'Adidas Originals',
+    handle: 'adidas-originals',
+    logo: '/brands/adidas-originals.png',
+  },
+  {name: 'New Balance', handle: 'new-balance', logo: '/brands/new-balance.png'},
+  {name: 'Asics', handle: 'asics', logo: '/brands/asics.png'},
+  {name: 'Puma', handle: 'puma', logo: '/brands/puma.png'},
+  {name: 'On', handle: 'on', logo: '/brands/on.png'},
+  {name: 'Hoka', handle: 'hoka', logo: '/brands/hoka.png'},
+  {name: 'Converse', handle: 'converse', logo: '/brands/converse.png'},
+  {name: 'Vans', handle: 'vans', logo: '/brands/vans.png'},
 ];
 
-/** Homepage "univers" tiles. `handle` = Shopify collection handle. */
+/**
+ * Homepage "univers" tiles. `handle` = Shopify collection handle.
+ * `image` (optional): your own photo in /public/home/ (e.g. '/home/running.jpg').
+ * When empty, the tile uses the collection image or its first product photo.
+ */
 export const CATEGORIES = [
   {
     title: 'Running',
     kicker: '01',
     copy: 'Amorti, rebond, vitesse.',
     handle: 'running',
+    image: '',
   },
   {
     title: 'Lifestyle',
     kicker: '02',
     copy: 'Les silhouettes de la rue.',
     handle: 'lifestyle',
+    image: '',
   },
   {
     title: 'Basketball',
     kicker: '03',
     copy: 'Né sur le parquet.',
     handle: 'basketball',
+    image: '',
   },
   {
     title: 'Outdoor',
     kicker: '04',
     copy: 'Grip et protection, partout.',
     handle: 'outdoor',
+    image: '',
   },
 ];
 
