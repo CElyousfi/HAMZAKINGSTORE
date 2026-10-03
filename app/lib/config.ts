@@ -140,28 +140,28 @@ export const CATEGORIES = [
     kicker: '01',
     copy: 'Amorti, rebond, vitesse.',
     handle: 'running',
-    image: '',
+    image: '/home/tile-running.webp',
   },
   {
     title: 'Lifestyle',
     kicker: '02',
     copy: 'Les silhouettes de la rue.',
     handle: 'lifestyle',
-    image: '',
+    image: '/home/tile-lifestyle.webp',
   },
   {
     title: 'Basketball',
     kicker: '03',
     copy: 'Né sur le parquet.',
     handle: 'basketball',
-    image: '',
+    image: '/home/tile-basketball.webp',
   },
   {
     title: 'Outdoor',
     kicker: '04',
     copy: 'Grip et protection, partout.',
     handle: 'outdoor',
-    image: '',
+    image: '/home/tile-outdoor.webp',
   },
 ];
 

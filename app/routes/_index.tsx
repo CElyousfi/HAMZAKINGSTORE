@@ -1,4 +1,5 @@
 import {Await, useLoaderData, Link, useRouteLoaderData} from 'react-router';
+import {SmartImage} from '~/components/SmartImage';
 import type {Route} from './+types/_index';
 import {Suspense, useEffect, useRef} from 'react';
 import {Image} from '@shopify/hydrogen';
@@ -17,6 +18,7 @@ import {
   POPULAR_CATEGORIES,
   SITE,
   STORIES,
+  localPhoto,
   type Story,
 } from '~/lib/content';
 import type {RootLoader} from '~/root';
@@ -260,11 +262,12 @@ function CampaignHero({product}: {product?: CardProduct}) {
             playsInline
           />
         ) : c.image ? (
-          <img
+          <SmartImage
             className="hero-media"
-            src={c.image}
-            alt=""
-            fetchPriority="high"
+            data={localPhoto(c.image)}
+            alt="Coureur sur un sentier de l’Atlas au coucher du soleil"
+            sizes="(min-width: 64em) 60vw, 100vw"
+            priority
           />
         ) : image ? (
           <Image
@@ -335,7 +338,7 @@ function UniverseGrid({images}: {images: MenuImages}) {
   return (
     <div className="universe-grid">
       {CATEGORIES.map((cat, i) => {
-        const img = cat.image ? {url: cat.image} : images[cat.handle];
+        const img = cat.image ? localPhoto(cat.image) : images[cat.handle];
         return (
           <Link
             key={cat.handle}
@@ -345,7 +348,7 @@ function UniverseGrid({images}: {images: MenuImages}) {
             style={{['--d' as string]: `${i * 80}ms`}}
           >
             {img ? (
-              <Image
+              <SmartImage
                 data={img}
                 alt=""
                 className="universe-img"
@@ -389,9 +392,11 @@ function StoryBlock({
         <Suspense fallback={null}>
           <Await resolve={menuImages}>
             {(imgs) => {
-              const img = story.image ? {url: story.image} : imgs[story.handle];
+              const img = story.image
+                ? localPhoto(story.image)
+                : imgs[story.handle];
               return img ? (
-                <Image
+                <SmartImage
                   data={img}
                   alt=""
                   sizes="(min-width: 64em) 60vw, 100vw"
@@ -450,10 +455,10 @@ function EditorialBand({menuImages}: {menuImages: Promise<MenuImages>}) {
           <Await resolve={menuImages}>
             {(imgs) => {
               const img = EDITORIAL.image
-                ? {url: EDITORIAL.image}
+                ? localPhoto(EDITORIAL.image)
                 : (imgs['outdoor'] ?? imgs['all']);
               return img ? (
-                <Image data={img} alt="" sizes="100vw" loading="lazy" />
+                <SmartImage data={img} alt="" sizes="100vw" loading="lazy" />
               ) : null;
             }}
           </Await>

@@ -40,7 +40,7 @@ export const CAMPAIGN: Campaign = {
     to: '/collections/all?sort=newest',
   },
   secondary: {label: 'Voir les marques', to: '/marques'},
-  image: '',
+  image: '/home/hero.webp',
   video: '',
   theme: 'dark',
 };
@@ -64,7 +64,7 @@ export const STORIES: Story[] = [
     title: 'Running, du premier au dernier kilomètre.',
     copy: 'Amorti réactif, tiges respirantes et semelles qui accrochent. Les paires pensées pour tes sorties du matin comme pour la course du dimanche.',
     handle: 'running',
-    image: '',
+    image: '/home/story-running.webp',
     ctas: [
       {label: 'Modèle homme', to: '/collections/homme-running'},
       {label: 'Modèle femme', to: '/collections/femme-running'},
@@ -77,7 +77,7 @@ export const STORIES: Story[] = [
     title: 'Ose quitter le bitume.',
     copy: 'Les silhouettes rétro et les icônes de la rue, dans les coloris que tout le monde cherche.',
     handle: 'lifestyle',
-    image: '',
+    image: '/home/story-lifestyle.webp',
     ctas: [{label: 'Découvrir le lifestyle', to: '/collections/lifestyle'}],
     align: 'right',
     theme: 'ink',
@@ -90,7 +90,7 @@ export const EDITORIAL = {
   title: 'Vérifiée à la main. Portée sans doute.',
   copy: 'Chaque paire passe entre nos mains avant de partir : étiquettes, coutures, boîte, odeur de colle. Si quelque chose cloche, elle ne part pas.',
   cta: {label: 'Notre promesse d’authenticité', to: '/pages/authenticite'},
-  image: '',
+  image: '/home/band-authenticite.webp',
 };
 
 /* ---------- Icon models: families shown in the mega-menu & on the home ---------- */
@@ -377,3 +377,75 @@ export const PAGES: Record<
     sections: [],
   },
 };
+
+/* ---------- Site photography (files in /public/home/) ----------
+ * Every photo ships as name.webp (full) + name-800.webp (mobile/cards).
+ * To swap a photo: replace both files and keep the name.
+ */
+export type Photo = {url: string; width: number; height: number};
+const photo = (name: string, width: number, height: number): Photo => ({
+  url: `/home/${name}.webp`,
+  width,
+  height,
+});
+
+export const PHOTOS = {
+  hero: photo('hero', 1254, 1254),
+  tileRunning: photo('tile-running', 1122, 1402),
+  tileLifestyle: photo('tile-lifestyle', 1122, 1402),
+  tileBasketball: photo('tile-basketball', 1122, 1402),
+  tileOutdoor: photo('tile-outdoor', 1122, 1402),
+  storyRunning: photo('story-running', 1536, 1024),
+  storyLifestyle: photo('story-lifestyle', 1536, 1024),
+  band: photo('band-authenticite', 1600, 685),
+  colAll: photo('col-nouveautes', 1010, 1024),
+  colLimited: photo('col-limited', 1536, 1024),
+  colHomme: photo('col-homme', 1536, 1024),
+  colFemme: photo('col-femme', 1536, 1024),
+  colPlateformes: photo('col-plateformes', 1536, 1024),
+  colEnfant: photo('col-enfant', 1536, 1024),
+  colRunning: photo('col-running', 1536, 1024),
+  colBasketball: photo('col-basketball', 1536, 1024),
+  colOutdoor: photo('col-outdoor', 1536, 1024),
+} satisfies Record<string, Photo>;
+
+/**
+ * Collection handle → photo. Used by the mega-menu cards, the Marques panel,
+ * /marques and the collection page hero. A collection image set in Shopify
+ * admin always wins over these; product photos are the last fallback.
+ */
+export const COLLECTION_IMAGES: Record<string, Photo> = {
+  all: PHOTOS.colAll,
+  nouveautes: PHOTOS.colAll,
+  limited: PHOTOS.colLimited,
+  homme: PHOTOS.colHomme,
+  femme: PHOTOS.colFemme,
+  'femme-plateformes': PHOTOS.colPlateformes,
+  enfant: PHOTOS.colEnfant,
+  running: PHOTOS.colRunning,
+  'homme-running': PHOTOS.storyRunning,
+  'femme-running': PHOTOS.storyRunning,
+  lifestyle: PHOTOS.storyLifestyle,
+  'homme-lifestyle': PHOTOS.colHomme,
+  'femme-lifestyle': PHOTOS.tileLifestyle,
+  basketball: PHOTOS.colBasketball,
+  outdoor: PHOTOS.colOutdoor,
+  promo: PHOTOS.colAll,
+  // Brands: photos that feature a model from that brand
+  jordan: PHOTOS.colBasketball,
+  nike: PHOTOS.tileBasketball,
+  converse: PHOTOS.colPlateformes,
+  vans: PHOTOS.colEnfant,
+  on: PHOTOS.colHomme,
+  hoka: PHOTOS.colRunning,
+  puma: PHOTOS.tileLifestyle,
+  adidas: PHOTOS.storyLifestyle,
+  'adidas-originals': PHOTOS.storyLifestyle,
+  asics: PHOTOS.storyLifestyle,
+  'new-balance': PHOTOS.band,
+};
+
+/** Resolve a /public path to its known dimensions (for width/height attrs). */
+export function localPhoto(url: string): Photo | {url: string} {
+  return Object.values(PHOTOS).find((p) => p.url === url) ?? {url};
+}

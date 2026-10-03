@@ -1,4 +1,6 @@
 import {Suspense, useEffect, useRef, useState} from 'react';
+import {SmartImage} from '~/components/SmartImage';
+import {localPhoto} from '~/lib/content';
 import {Await, Link, NavLink, useAsyncValue, useLocation} from 'react-router';
 import {Image, useOptimisticCart, useAnalytics} from '@shopify/hydrogen';
 import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
@@ -236,7 +238,7 @@ function BrandMegaPanel({
               <Await resolve={menuImages}>
                 {(imgs) =>
                   imgs[brand.handle] ? (
-                    <Image
+                    <SmartImage
                       key={brand.handle}
                       data={imgs[brand.handle]}
                       alt=""
@@ -352,12 +354,12 @@ function MegaPanel({
                 <Await resolve={menuImages}>
                   {(imgs) => {
                     const img = f.image
-                      ? {url: f.image}
+                      ? localPhoto(f.image)
                       : f.handle
                         ? imgs[f.handle]
                         : undefined;
                     return img ? (
-                      <Image
+                      <SmartImage
                         data={img}
                         alt=""
                         className="mega-feature-img"

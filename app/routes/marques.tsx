@@ -1,4 +1,5 @@
 import {Await, Link, useRouteLoaderData} from 'react-router';
+import {SmartImage} from '~/components/SmartImage';
 import {Suspense, useMemo, useState} from 'react';
 import {Image} from '@shopify/hydrogen';
 import type {Route} from './+types/marques';
@@ -84,7 +85,7 @@ export default function BrandsPage() {
                       <Await resolve={menuImages}>
                         {(imgs) =>
                           imgs[b.handle] ? (
-                            <Image
+                            <SmartImage
                               data={imgs[b.handle]}
                               alt=""
                               className="brand-card-img"

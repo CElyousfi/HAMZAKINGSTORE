@@ -1,6 +1,8 @@
 import {useLoaderData, Link} from 'react-router';
 import type {Route} from './+types/collections._index';
-import {getPaginationVariables, Image} from '@shopify/hydrogen';
+import {getPaginationVariables} from '@shopify/hydrogen';
+import {SmartImage} from '~/components/SmartImage';
+import {COLLECTION_IMAGES} from '~/lib/content';
 import type {CollectionFragment} from 'storefrontapi.generated';
 import {PaginatedResourceSection} from '~/components/PaginatedResourceSection';
 
@@ -81,11 +83,11 @@ function CollectionItem({
       to={`/collections/${collection.handle}`}
       prefetch="intent"
     >
-      {collection?.image ? (
-        <Image
-          alt={collection.image.altText || collection.title}
+      {collection?.image || COLLECTION_IMAGES[collection.handle] ? (
+        <SmartImage
+          alt={collection.image?.altText || collection.title}
           aspectRatio="1/1"
-          data={collection.image}
+          data={collection.image ?? COLLECTION_IMAGES[collection.handle]}
           loading={index < 3 ? 'eager' : undefined}
           sizes="(min-width: 45em) 400px, 100vw"
         />

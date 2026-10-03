@@ -1,4 +1,5 @@
 import {useEffect, useState} from 'react';
+import {SmartImage} from '~/components/SmartImage';
 import {
   Form,
   Link,
@@ -119,7 +120,7 @@ export function CollectionView({
       <header className={`plp-hero ${image ? 'plp-hero--image' : ''}`}>
         {image ? (
           <div className="plp-hero-media" aria-hidden>
-            <Image data={image} alt="" sizes="100vw" loading="eager" />
+            <SmartImage data={image} alt="" sizes="100vw" loading="eager" />
           </div>
         ) : null}
         <div className="container plp-hero-inner">

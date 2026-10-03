@@ -26,6 +26,7 @@ import {PageLayout} from './components/PageLayout';
 import {BrandLogo} from './components/BrandLogo';
 import {MetaPixel} from './components/MetaPixel';
 import fontStyles from '~/styles/fonts.css?url';
+import {COLLECTION_IMAGES} from '~/lib/content';
 
 export type RootLoader = typeof loader;
 
@@ -169,16 +170,20 @@ function loadDeferredData({context}: Route.LoaderArgs) {
           width?: number | null;
           height?: number | null;
         }
-      > = {};
+      > = {...COLLECTION_IMAGES};
       for (const c of r.collections.nodes) {
-        const img = c.image ?? c.products.nodes[0]?.featuredImage;
+        // Shopify collection image > our photography > first product photo
+        const img =
+          c.image ??
+          COLLECTION_IMAGES[c.handle] ??
+          c.products.nodes[0]?.featuredImage;
         if (img) map[c.handle] = img;
       }
       return map;
     })
     .catch((error: Error) => {
       console.error(error);
-      return {} as Record<string, {url: string}>;
+      return {...COLLECTION_IMAGES} as Record<string, {url: string}>;
     });
   return {
     cart: cart.get(),

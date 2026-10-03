@@ -205,7 +205,9 @@ main {
   text-transform: uppercase;
   overflow: hidden;
   isolation: isolate;
-  transition: color 0.35s var(--ease), border-color 0.35s var(--ease);
+  transition:
+    color 0.35s var(--ease),
+    border-color 0.35s var(--ease);
   white-space: nowrap;
 }
 .btn::before {
@@ -577,14 +579,18 @@ main {
   visibility: hidden;
   opacity: 0;
   transform: translateY(-8px);
-  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease-out),
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.35s var(--ease-out),
     visibility 0s 0.3s;
 }
 .mega.is-open {
   visibility: visible;
   opacity: 1;
   transform: none;
-  transition: opacity 0.25s var(--ease), transform 0.35s var(--ease-out),
+  transition:
+    opacity 0.25s var(--ease),
+    transform 0.35s var(--ease-out),
     visibility 0s;
 }
 .mega-inner {
@@ -619,18 +625,33 @@ main {
   font-size: 15px;
   transform: translateY(100%);
   opacity: 0;
-  transition: transform 0.5s var(--ease-out), opacity 0.4s, color 0.2s;
+  transition:
+    transform 0.5s var(--ease-out),
+    opacity 0.4s,
+    color 0.2s;
 }
 .mega.is-open .mega-col a {
   transform: none;
   opacity: 1;
 }
-.mega.is-open .mega-col li:nth-child(2) a { transition-delay: 0.03s; }
-.mega.is-open .mega-col li:nth-child(3) a { transition-delay: 0.06s; }
-.mega.is-open .mega-col li:nth-child(4) a { transition-delay: 0.09s; }
-.mega.is-open .mega-col li:nth-child(5) a { transition-delay: 0.12s; }
-.mega.is-open .mega-col li:nth-child(6) a { transition-delay: 0.15s; }
-.mega.is-open .mega-col li:nth-child(n + 7) a { transition-delay: 0.18s; }
+.mega.is-open .mega-col li:nth-child(2) a {
+  transition-delay: 0.03s;
+}
+.mega.is-open .mega-col li:nth-child(3) a {
+  transition-delay: 0.06s;
+}
+.mega.is-open .mega-col li:nth-child(4) a {
+  transition-delay: 0.09s;
+}
+.mega.is-open .mega-col li:nth-child(5) a {
+  transition-delay: 0.12s;
+}
+.mega.is-open .mega-col li:nth-child(6) a {
+  transition-delay: 0.15s;
+}
+.mega.is-open .mega-col li:nth-child(n + 7) a {
+  transition-delay: 0.18s;
+}
 .mega-col a:hover {
   color: var(--ash);
 }
@@ -1030,7 +1051,8 @@ main {
 .hero-grid {
   position: absolute;
   inset: 0;
-  background-image: linear-gradient(var(--line-2) 1px, transparent 1px),
+  background-image:
+    linear-gradient(var(--line-2) 1px, transparent 1px),
     linear-gradient(90deg, var(--line-2) 1px, transparent 1px);
   background-size: 64px 64px;
   opacity: 0.45;
@@ -1218,7 +1240,9 @@ main {
   height: 100%;
   object-fit: contain;
   mix-blend-mode: multiply;
-  transition: opacity 0.5s var(--ease), transform 0.8s var(--ease-out);
+  transition:
+    opacity 0.5s var(--ease),
+    transform 0.8s var(--ease-out);
 }
 .card-img--empty {
   background: var(--stone);
@@ -1307,7 +1331,9 @@ main {
     backdrop-filter: blur(8px);
     opacity: 0;
     transform: translateY(10px);
-    transition: opacity 0.3s var(--ease), transform 0.4s var(--ease-out);
+    transition:
+      opacity 0.3s var(--ease),
+      transform 0.4s var(--ease-out);
   }
   .card-frame:hover .quickadd,
   .quickadd:focus-within {
@@ -1381,7 +1407,9 @@ button.quickadd-size:hover {
   height: 100%;
   object-fit: cover;
   opacity: 0.85;
-  transition: transform 1.2s var(--ease-out), opacity 0.5s;
+  transition:
+    transform 1.2s var(--ease-out),
+    opacity 0.5s;
 }
 .universe-img--empty {
   background: radial-gradient(circle at 70% 30%, #3a3632, var(--ink) 70%);
@@ -1529,7 +1557,9 @@ button.quickadd-size:hover {
 }
 .brand-list a {
   isolation: isolate;
-  transition: color 0.3s, padding 0.45s var(--ease-out);
+  transition:
+    color 0.3s,
+    padding 0.45s var(--ease-out);
 }
 .brand-list a:hover {
   color: var(--paper);
@@ -1884,7 +1914,9 @@ button.quickadd-size:hover {
   gap: 40px;
   padding-top: 28px;
   padding-bottom: 80px;
-  transition: grid-template-columns 0.5s var(--ease-out), gap 0.5s var(--ease-out);
+  transition:
+    grid-template-columns 0.5s var(--ease-out),
+    gap 0.5s var(--ease-out);
 }
 .plp-body.is-collapsed {
   grid-template-columns: 0px minmax(0, 1fr);
@@ -1983,7 +2015,9 @@ button.quickadd-size:hover {
   box-shadow: inset 0 0 0 1px rgb(0 0 0 / 0.12);
 }
 .fcheck.is-active .fswatch {
-  box-shadow: 0 0 0 2px var(--paper), 0 0 0 3px var(--ink);
+  box-shadow:
+    0 0 0 2px var(--paper),
+    0 0 0 3px var(--ink);
 }
 .fcount {
   font-size: 12px;
@@ -2220,7 +2254,10 @@ button.quickadd-size:hover {
   border-radius: var(--radius);
   font-size: 14px;
   font-variant-numeric: tabular-nums;
-  transition: border-color 0.2s, background 0.2s, color 0.2s;
+  transition:
+    border-color 0.2s,
+    background 0.2s,
+    color 0.2s;
 }
 .opt-item:hover:not(:disabled) {
   border-color: var(--ink);
@@ -2274,8 +2311,12 @@ button.quickadd-size:hover {
   color: var(--clay);
 }
 @keyframes shake {
-  25% { transform: translateX(-5px); }
-  75% { transform: translateX(5px); }
+  25% {
+    transform: translateX(-5px);
+  }
+  75% {
+    transform: translateX(5px);
+  }
 }
 .pdp-buy {
   display: grid;
@@ -2907,7 +2948,9 @@ body:has(.sticky-buy.is-visible) .wa-float {
     opacity: 1;
     visibility: hidden;
     transform: translateX(-100%);
-    transition: transform 0.5s var(--ease-out), visibility 0s 0.5s;
+    transition:
+      transform 0.5s var(--ease-out),
+      visibility 0s 0.5s;
   }
   .filters.is-open {
     visibility: visible;
@@ -3301,7 +3344,9 @@ body:has(.consent) .wa-float {
   height: 40px;
   border-radius: 50%;
   color: var(--ink);
-  transition: transform 0.25s var(--ease-out), color 0.2s;
+  transition:
+    transform 0.25s var(--ease-out),
+    color 0.2s;
 }
 .wish:hover {
   transform: scale(1.08);
@@ -3322,7 +3367,9 @@ body:has(.consent) .wa-float {
   background: rgb(255 255 255 / 0.9);
   backdrop-filter: blur(6px);
   opacity: 0;
-  transition: opacity 0.25s, transform 0.25s var(--ease-out);
+  transition:
+    opacity 0.25s,
+    transform 0.25s var(--ease-out);
 }
 .card-frame:hover .card-wish,
 .card-wish.is-active,
@@ -3420,7 +3467,11 @@ body:has(.consent) .wa-float {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(18 16 14 / 0.05) 20%, rgb(18 16 14 / 0.78));
+  background: linear-gradient(
+    180deg,
+    rgb(18 16 14 / 0.05) 20%,
+    rgb(18 16 14 / 0.78)
+  );
 }
 .mega-feature:hover .mega-feature-img {
   transform: scale(1.05);
@@ -3598,11 +3649,27 @@ body:has(.consent) .wa-float {
   opacity: 0.22;
   filter: grayscale(1) contrast(1.1);
 }
+/* Real photography: keep the colour, let the gradient carry legibility */
+.band-bg img[src^='/home/'] {
+  opacity: 1;
+  filter: none;
+  object-position: 60% 50%;
+}
 .band-bg::after {
   content: '';
   position: absolute;
   inset: 0;
   background: linear-gradient(90deg, var(--ink) 20%, rgb(18 16 14 / 0.6));
+}
+.band-bg:has(img[src^='/home/'])::after {
+  background:
+    linear-gradient(
+      90deg,
+      var(--ink) 8%,
+      rgb(18 16 14 / 0.86) 42%,
+      rgb(18 16 14 / 0.62)
+    ),
+    linear-gradient(0deg, rgb(18 16 14 / 0.5), transparent 40%);
 }
 .band-inner {
   position: relative;
@@ -3723,7 +3790,11 @@ body:has(.consent) .wa-float {
   content: '';
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgb(18 16 14 / 0.15), rgb(18 16 14 / 0.75));
+  background: linear-gradient(
+    180deg,
+    rgb(18 16 14 / 0.15),
+    rgb(18 16 14 / 0.75)
+  );
 }
 .plp-hero-inner {
   position: relative;
@@ -4526,14 +4597,30 @@ body:has(.consent) .wa-float {
     background 0.25s var(--ease),
     border-color 0.25s var(--ease);
 }
-.mega.is-open .bmega-grid li:nth-child(2) .bmega-tile { transition-delay: 0.02s, 0.02s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(3) .bmega-tile { transition-delay: 0.04s, 0.04s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(4) .bmega-tile { transition-delay: 0.06s, 0.06s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(5) .bmega-tile { transition-delay: 0.08s, 0.08s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(6) .bmega-tile { transition-delay: 0.1s, 0.1s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(7) .bmega-tile { transition-delay: 0.12s, 0.12s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(8) .bmega-tile { transition-delay: 0.14s, 0.14s, 0s, 0s; }
-.mega.is-open .bmega-grid li:nth-child(n + 9) .bmega-tile { transition-delay: 0.16s, 0.16s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(2) .bmega-tile {
+  transition-delay: 0.02s, 0.02s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(3) .bmega-tile {
+  transition-delay: 0.04s, 0.04s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(4) .bmega-tile {
+  transition-delay: 0.06s, 0.06s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(5) .bmega-tile {
+  transition-delay: 0.08s, 0.08s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(6) .bmega-tile {
+  transition-delay: 0.1s, 0.1s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(7) .bmega-tile {
+  transition-delay: 0.12s, 0.12s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(8) .bmega-tile {
+  transition-delay: 0.14s, 0.14s, 0s, 0s;
+}
+.mega.is-open .bmega-grid li:nth-child(n + 9) .bmega-tile {
+  transition-delay: 0.16s, 0.16s, 0s, 0s;
+}
 .bmega-logo {
   max-height: 34px;
   max-width: 78%;

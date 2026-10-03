@@ -5,6 +5,7 @@ import {
   PRODUCT_CARD_FRAGMENT,
   type CardProduct,
 } from '~/components/ProductItem';
+import {COLLECTION_IMAGES} from '~/lib/content';
 import {CollectionView, type Filter} from '~/components/CollectionView';
 import {
   FILTERS_SELECTION,
@@ -65,6 +66,7 @@ export default function AllProducts() {
       filters={filters}
       sort={sort}
       handle="all"
+      image={COLLECTION_IMAGES.all}
     />
   );
 }

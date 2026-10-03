@@ -6,6 +6,7 @@ import {
   PRODUCT_CARD_FRAGMENT,
   type CardProduct,
 } from '~/components/ProductItem';
+import {COLLECTION_IMAGES} from '~/lib/content';
 import {CollectionView, type Filter} from '~/components/CollectionView';
 import {
   FILTERS_SELECTION,
@@ -71,7 +72,7 @@ export default function Collection() {
         filters={collection.products.filters as Filter[]}
         sort={sort}
         handle={collection.handle}
-        image={collection.image}
+        image={collection.image ?? COLLECTION_IMAGES[collection.handle]}
       />
       <Analytics.CollectionView
         data={{collection: {id: collection.id, handle: collection.handle}}}
