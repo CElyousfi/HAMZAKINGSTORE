@@ -7,7 +7,7 @@ import type {
 } from 'storefrontapi.generated';
 import {Aside, useAside} from '~/components/Aside';
 import {Footer} from '~/components/Footer';
-import {Header} from '~/components/Header';
+import {Header, type MenuImages} from '~/components/Header';
 import {CartMain} from '~/components/CartMain';
 import {
   SEARCH_ENDPOINT,
@@ -17,9 +17,17 @@ import {SearchResultsPredictive} from '~/components/SearchResultsPredictive';
 import {WhatsAppFloat} from '~/components/WhatsAppButton';
 import {NAVIGATION} from '~/lib/navigation';
 import {BRANDS, whatsappLink} from '~/lib/config';
+import {ICON_MODELS} from '~/lib/content';
+import {
+  usePageTransition,
+  useRecentSearches,
+  useRevealOnScroll,
+  useWishlist,
+} from '~/lib/ui';
 import {
   IconArrow,
   IconChevron,
+  IconHeart,
   IconSearch,
   IconUser,
   IconWhatsApp,
@@ -31,6 +39,7 @@ interface PageLayoutProps {
   header: HeaderQuery;
   isLoggedIn: Promise<boolean>;
   publicStoreDomain: string;
+  menuImages: Promise<MenuImages>;
   children?: React.ReactNode;
 }
 
@@ -41,7 +50,10 @@ export function PageLayout({
   header,
   isLoggedIn,
   publicStoreDomain,
+  menuImages,
 }: PageLayoutProps) {
+  useRevealOnScroll();
+  usePageTransition();
   return (
     <Aside.Provider>
       <a href="#main" className="skip-link">
@@ -55,6 +67,7 @@ export function PageLayout({
         cart={cart}
         isLoggedIn={isLoggedIn}
         publicStoreDomain={publicStoreDomain}
+        menuImages={menuImages}
       />
       <main id="main">{children}</main>
       <Footer
@@ -79,17 +92,9 @@ function CartAside({cart}: {cart: PageLayoutProps['cart']}) {
   );
 }
 
-const POPULAR_SEARCHES = [
-  'Air Force 1',
-  'Samba',
-  '9060',
-  'Gel-Kayano',
-  'Dunk Low',
-  'Cloud',
-];
-
 function SearchAside() {
   const queriesDatalistId = useId();
+  const recent = useRecentSearches();
   return (
     <Aside type="search" heading="Rechercher" side="top">
       <div className="search-drawer">
@@ -101,15 +106,21 @@ function SearchAside() {
                 name="q"
                 onChange={fetchResults}
                 onFocus={fetchResults}
-                placeholder="Modèle, marque, couleur…"
+                placeholder="Un modèle, une marque, une couleur…"
                 ref={inputRef}
                 type="search"
                 list={queriesDatalistId}
                 autoComplete="off"
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter') recent.push(e.currentTarget.value);
+                }}
               />
               <button
                 type="button"
-                onClick={goToSearch}
+                onClick={() => {
+                  recent.push(inputRef.current?.value ?? '');
+                  goToSearch();
+                }}
                 className="btn btn--sm"
               >
                 Chercher
@@ -125,18 +136,60 @@ function SearchAside() {
             if (!term.current) {
               return (
                 <div className="search-suggest">
-                  <p className="eyebrow">Recherches populaires</p>
-                  <div className="chip-row">
-                    {POPULAR_SEARCHES.map((q) => (
-                      <Link
-                        key={q}
-                        className="chip"
-                        to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(q)}`}
-                        onClick={closeSearch}
-                      >
-                        {q}
-                      </Link>
-                    ))}
+                  {recent.items.length ? (
+                    <div className="search-block">
+                      <div className="search-block-head">
+                        <p className="eyebrow">Recherches récentes</p>
+                        <button className="link-btn" onClick={recent.clear}>
+                          Effacer
+                        </button>
+                      </div>
+                      <div className="chip-row">
+                        {recent.items.map((q) => (
+                          <Link
+                            key={q}
+                            className="chip"
+                            to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(q)}`}
+                            onClick={closeSearch}
+                          >
+                            {q}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  ) : null}
+                  <div className="search-block">
+                    <p className="eyebrow">Les plus recherchés</p>
+                    <div className="chip-row">
+                      {ICON_MODELS.slice(0, 8).map((m) => (
+                        <Link
+                          key={m.name}
+                          className="chip"
+                          to={`${SEARCH_ENDPOINT}?q=${encodeURIComponent(m.query)}`}
+                          onClick={() => {
+                            recent.push(m.query);
+                            closeSearch();
+                          }}
+                        >
+                          {m.name}
+                        </Link>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="search-block">
+                    <p className="eyebrow">Marques</p>
+                    <div className="chip-row">
+                      {BRANDS.map((b) => (
+                        <Link
+                          key={b.handle}
+                          className="chip"
+                          to={`/collections/${b.handle}`}
+                          onClick={closeSearch}
+                        >
+                          {b.name}
+                        </Link>
+                      ))}
+                    </div>
                   </div>
                 </div>
               );
@@ -147,7 +200,14 @@ function SearchAside() {
             }
 
             if (!total) {
-              return <SearchResultsPredictive.Empty term={term} />;
+              return (
+                <div className="search-suggest">
+                  <SearchResultsPredictive.Empty term={term} />
+                  <p className="muted small">
+                    Essaie avec le nom du modèle (ex. « Samba ») ou la marque.
+                  </p>
+                </div>
+              );
             }
 
             return (
@@ -168,7 +228,10 @@ function SearchAside() {
                 />
                 <Link
                   className="link-arrow"
-                  onClick={closeSearch}
+                  onClick={() => {
+                    recent.push(term.current);
+                    closeSearch();
+                  }}
                   to={`${SEARCH_ENDPOINT}?q=${term.current}`}
                 >
                   Voir tous les résultats pour « {term.current} »
@@ -186,6 +249,7 @@ function SearchAside() {
 function MobileMenuAside() {
   const {close} = useAside();
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const {count} = useWishlist();
   return (
     <Aside
       type="mobile"
@@ -194,7 +258,11 @@ function MobileMenuAside() {
       footer={
         <div className="mnav-foot">
           <Link to="/account" onClick={close} className="mnav-foot-link">
-            <IconUser /> Mon compte
+            <IconUser /> Compte
+          </Link>
+          <Link to="/wishlist" onClick={close} className="mnav-foot-link">
+            <IconHeart filled={count > 0} /> Wishlist
+            {count ? ` (${count})` : ''}
           </Link>
           <a
             href={whatsappLink('Salam ! J’ai besoin d’aide.')}
@@ -241,9 +309,11 @@ function MobileMenuAside() {
                   <Link to={item.to} onClick={close} className="mnav-all">
                     Tout voir
                   </Link>
-                  {item.columns.map((col) => (
-                    <div key={col.title} className="mnav-col">
-                      <p className="eyebrow">{col.title}</p>
+                  {item.columns.map((col, ci) => (
+                    <div key={`${col.title}-${ci}`} className="mnav-col">
+                      {col.title.trim() ? (
+                        <p className="eyebrow">{col.title}</p>
+                      ) : null}
                       {col.links.map((l) => (
                         <Link key={l.label} to={l.to} onClick={close}>
                           {l.label}
@@ -271,6 +341,17 @@ function MobileMenuAside() {
             </Link>
           ))}
         </div>
+      </div>
+      <div className="mnav-links">
+        <Link to="/pages/faq" onClick={close}>
+          Aide & FAQ
+        </Link>
+        <Link to="/account/orders" onClick={close}>
+          Suivre ma commande
+        </Link>
+        <Link to="/pages/contact" onClick={close}>
+          Contact
+        </Link>
       </div>
     </Aside>
   );

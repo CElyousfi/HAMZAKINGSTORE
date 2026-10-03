@@ -6,9 +6,17 @@ import {
   useNavigate,
   useNavigation,
 } from 'react-router';
+import {Image} from '@shopify/hydrogen';
+import {subChips} from '~/lib/navigation';
 import {PaginatedResourceSection} from './PaginatedResourceSection';
 import {ProductItem, type CardProduct} from './ProductItem';
-import {IconClose, IconFilter, IconChevron} from './Icons';
+import {
+  IconClose,
+  IconFilter,
+  IconChevron,
+  IconGrid2,
+  IconGrid4,
+} from './Icons';
 import {
   SORT_OPTIONS,
   clearFilters,
@@ -42,6 +50,13 @@ type Connection = {
   };
 };
 
+type HeroImage = {
+  url: string;
+  altText?: string | null;
+  width?: number | null;
+  height?: number | null;
+};
+
 export function CollectionView({
   title,
   description,
@@ -49,6 +64,8 @@ export function CollectionView({
   products,
   filters,
   sort,
+  handle = '',
+  image,
 }: {
   title: string;
   description?: string | null;
@@ -56,9 +73,30 @@ export function CollectionView({
   products: Connection;
   filters: Filter[];
   sort: SortValue;
+  handle?: string;
+  image?: HeroImage | null;
 }) {
   const [panelOpen, setPanelOpen] = useState(true);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [density, setDensity] = useState<'cozy' | 'compact'>('cozy');
+  useEffect(() => {
+    try {
+      const saved = window.localStorage.getItem('hk:density');
+      if (saved === 'compact' || saved === 'cozy') setDensity(saved);
+    } catch {
+      /* ignore */
+    }
+  }, []);
+  const toggleDensity = () => {
+    const next = density === 'cozy' ? 'compact' : 'cozy';
+    setDensity(next);
+    try {
+      window.localStorage.setItem('hk:density', next);
+    } catch {
+      /* ignore */
+    }
+  };
+  const chips = subChips(handle);
   const location = useLocation();
   const navigate = useNavigate();
   const navigation = useNavigation();
@@ -76,18 +114,36 @@ export function CollectionView({
 
   return (
     <div className="plp">
-      <header className="plp-hero container">
-        <nav className="crumbs" aria-label="Fil d’Ariane">
-          <Link to="/">Accueil</Link>
-          <span>/</span>
-          <span aria-current="page">{title}</span>
-        </nav>
-        <div className="plp-hero-row">
-          <div>
-            <p className="eyebrow">{eyebrow}</p>
-            <h1 className="display-xl">{title}</h1>
+      <header className={`plp-hero ${image ? 'plp-hero--image' : ''}`}>
+        {image ? (
+          <div className="plp-hero-media" aria-hidden>
+            <Image data={image} alt="" sizes="100vw" loading="eager" />
           </div>
-          {description ? <p className="plp-desc">{description}</p> : null}
+        ) : null}
+        <div className="container plp-hero-inner">
+          <nav className="crumbs" aria-label="Fil d’Ariane">
+            <Link to="/">Accueil</Link>
+            <span>/</span>
+            <Link to="/collections">Collections</Link>
+            <span>/</span>
+            <span aria-current="page">{title}</span>
+          </nav>
+          <div className="plp-hero-row">
+            <div>
+              <p className="eyebrow">{eyebrow}</p>
+              <h1 className="display-xl">{title}</h1>
+            </div>
+            {description ? <p className="plp-desc">{description}</p> : null}
+          </div>
+          {chips.length ? (
+            <div className="chip-row plp-chips">
+              {chips.map((c) => (
+                <Link key={c.to} to={c.to} className="chip" prefetch="intent">
+                  {c.label}
+                </Link>
+              ))}
+            </div>
+          ) : null}
         </div>
       </header>
 
@@ -114,6 +170,18 @@ export function CollectionView({
             {products.nodes.length}
             {products.pageInfo.hasNextPage ? '+' : ''} produits
           </p>
+          <button
+            className="toolbar-btn toolbar-btn--density hide-sm"
+            onClick={toggleDensity}
+            aria-label={
+              density === 'cozy'
+                ? 'Passer en vue compacte'
+                : 'Passer en vue étendue'
+            }
+            title={density === 'cozy' ? 'Vue compacte' : 'Vue étendue'}
+          >
+            {density === 'cozy' ? <IconGrid4 /> : <IconGrid2 />}
+          </button>
           <label className="sort">
             <span className="sr-only">Trier par</span>
             <span className="sort-label hide-sm">Trier :</span>
@@ -141,7 +209,9 @@ export function CollectionView({
         <ActiveFilters filters={filters} params={params} />
       </div>
 
-      <div className={`container plp-body ${panelOpen ? '' : 'is-collapsed'}`}>
+      <div
+        className={`container plp-body ${panelOpen ? '' : 'is-collapsed'} plp-body--${density}`}
+      >
         <aside
           className={`filters ${mobileOpen ? 'is-open' : ''}`}
           aria-label="Filtres"
@@ -215,6 +285,12 @@ export function CollectionView({
           )}
         </div>
       </div>
+      {description && description.length > 160 ? (
+        <section className="container plp-seo">
+          <p className="eyebrow">À propos</p>
+          <p>{description}</p>
+        </section>
+      ) : null}
     </div>
   );
 }

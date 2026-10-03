@@ -25,8 +25,11 @@ export default function Policies() {
   const {policies} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policies">
-      <h1>Policies</h1>
+    <div className="policies container">
+      <header className="page-head page-head--tight">
+        <p className="eyebrow">Informations légales</p>
+        <h1 className="display-l">Nos conditions.</h1>
+      </header>
       <div>
         {policies.map((policy) => (
           <fieldset key={policy.id}>

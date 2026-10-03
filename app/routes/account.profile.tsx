@@ -87,29 +87,29 @@ export default function AccountProfile() {
 
   return (
     <div className="account-profile">
-      <h2>My profile</h2>
+      <h2 className="display-s">Mon profil</h2>
       <br />
       <Form method="PUT">
-        <legend>Personal information</legend>
+        <legend>Informations personnelles</legend>
         <fieldset>
-          <label htmlFor="firstName">First name</label>
+          <label htmlFor="firstName">Prénom</label>
           <input
             id="firstName"
             name="firstName"
             type="text"
             autoComplete="given-name"
-            placeholder="First name"
+            placeholder="Prénom"
             aria-label="First name"
             defaultValue={customer.firstName ?? ''}
             minLength={2}
           />
-          <label htmlFor="lastName">Last name</label>
+          <label htmlFor="lastName">Nom</label>
           <input
             id="lastName"
             name="lastName"
             type="text"
             autoComplete="family-name"
-            placeholder="Last name"
+            placeholder="Nom"
             aria-label="Last name"
             defaultValue={customer.lastName ?? ''}
             minLength={2}
@@ -125,7 +125,7 @@ export default function AccountProfile() {
           <br />
         )}
         <button type="submit" disabled={state !== 'idle'}>
-          {state !== 'idle' ? 'Updating' : 'Update'}
+          {state !== 'idle' ? 'Mise à jour…' : 'Mettre à jour'}
         </button>
       </Form>
     </div>

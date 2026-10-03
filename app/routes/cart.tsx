@@ -34,6 +34,9 @@ export async function action({request, context}: Route.ActionArgs) {
     case CartForm.ACTIONS.LinesRemove:
       result = await cart.removeLines(inputs.lineIds);
       break;
+    case CartForm.ACTIONS.NoteUpdate:
+      result = await cart.updateNote(String(inputs.note ?? ''));
+      break;
     case CartForm.ACTIONS.DiscountCodesUpdate: {
       const formDiscountCode = inputs.discountCode;
 
@@ -105,8 +108,11 @@ export default function Cart() {
   const cart = useLoaderData<typeof loader>();
 
   return (
-    <div className="cart">
-      <h1>Cart</h1>
+    <div className="cart-page container">
+      <header className="cart-page-head">
+        <p className="eyebrow">Panier</p>
+        <h1 className="display-l">Ton panier.</h1>
+      </header>
       <CartMain layout="page" cart={cart} />
     </div>
   );

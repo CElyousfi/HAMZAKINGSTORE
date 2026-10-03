@@ -240,3 +240,32 @@ export const FOOTER_QUERY = `#graphql
   }
   ${MENU_FRAGMENT}
 ` as const;
+
+/** Collection images used by the mega-menu feature cards and homepage tiles. */
+export const MENU_COLLECTIONS_QUERY = `#graphql
+  query MenuCollections($country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    collections(first: 60) {
+      nodes {
+        handle
+        title
+        image {
+          url
+          altText
+          width
+          height
+        }
+        products(first: 1) {
+          nodes {
+            featuredImage {
+              url
+              altText
+              width
+              height
+            }
+          }
+        }
+      }
+    }
+  }
+` as const;

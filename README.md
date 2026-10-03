@@ -14,10 +14,28 @@ Warm monochrome design, French copy, prices in DH, cash-on-delivery messaging, W
 ## Where to edit things
 | What | File |
 |---|---|
-| Brand name, WhatsApp number, shipping rules, announcement bar, hero text, brands, category tiles | `app/lib/config.ts` |
+| Brand name, WhatsApp number, shipping rules, announcement bar, brands & logos, category tiles | `app/lib/config.ts` |
+| Campaign hero, story blocks, editorial band, icon models, guides, popular categories, delivery table, FAQ, built-in pages (à propos, authenticité, contact, guide des tailles) | `app/lib/content.ts` |
 | Mega-menu and footer links | `app/lib/navigation.ts` |
 | Colours, fonts, spacing (design tokens at the top) | `app/styles/app.css` |
 | Size chart | `app/components/SizeGuide.tsx` |
+
+## Product page extras (optional metafields, namespace `custom`)
+| Metafield key | Type | Shown as |
+|---|---|---|
+| `fit` | text | Fit note under the size grid ("Taille un peu petit…") |
+| `story` | text | Bold intro line in the description |
+| `weight`, `drop` | text | Rows in "Caractéristiques" |
+| `benefits` | JSON `[{"icon":"cushion","title":"…","copy":"…"}]` | The 3 benefit cards (icons: cushion, grip, feather, drop, bolt, shield) |
+| `specs` | JSON `[{"label":"…","value":"…"}]` | Extra rows in "Caractéristiques" |
+
+Without metafields the page falls back to sensible defaults based on the category tag.
+Tag a product `icone` to feature it in the "Les icônes" rail on the home page.
+
+## Built-in features
+Wishlist (saved on the device), recently viewed, cookie consent (gates the Meta Pixel), toasts,
+grid density toggle, colour swatches with variant photos, low-stock messages, share button,
+JSON-LD structured data, WhatsApp ordering everywhere, FR account & cart, fallback pages so no footer link 404s.
 
 ## Shopify setup checklist
 1. **Products**: give each sneaker one option named `Pointure` (or `Size`) with EU sizes. Vendor = brand.

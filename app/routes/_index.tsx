@@ -1,6 +1,6 @@
-import {Await, useLoaderData, Link} from 'react-router';
+import {Await, useLoaderData, Link, useRouteLoaderData} from 'react-router';
 import type {Route} from './+types/_index';
-import {Suspense} from 'react';
+import {Suspense, useEffect, useRef} from 'react';
 import {Image} from '@shopify/hydrogen';
 import {
   PRODUCT_CARD_FRAGMENT,
@@ -10,12 +10,43 @@ import {ProductRail} from '~/components/ProductRail';
 import {ServiceStrip} from '~/components/Footer';
 import {Price} from '~/components/Price';
 import {IconArrow} from '~/components/Icons';
-import {BRAND, BRANDS, CATEGORIES, HERO} from '~/lib/config';
+import {BRAND, BRANDS, CATEGORIES} from '~/lib/config';
+import {
+  CAMPAIGN,
+  EDITORIAL,
+  POPULAR_CATEGORIES,
+  SITE,
+  STORIES,
+  type Story,
+} from '~/lib/content';
+import type {RootLoader} from '~/root';
+import type {MenuImages} from '~/components/Header';
 
 export const meta: Route.MetaFunction = () => {
   return [
     {title: `${BRAND.name} | Sneakers authentiques au Maroc`},
     {name: 'description', content: BRAND.tagline},
+    {
+      property: 'og:title',
+      content: `${BRAND.name} | Sneakers authentiques au Maroc`,
+    },
+    {property: 'og:description', content: BRAND.tagline},
+    {property: 'og:url', content: SITE.url},
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Organization',
+        name: BRAND.name,
+        url: SITE.url,
+        logo: `${SITE.url}/favicon.svg`,
+        sameAs: [BRAND.instagram, BRAND.tiktok],
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: SITE.city,
+          addressCountry: 'MA',
+        },
+      },
+    },
   ];
 };
 
@@ -31,30 +62,42 @@ async function loadCriticalData({context}: Route.LoaderArgs) {
 }
 
 function loadDeferredData({context}: Route.LoaderArgs) {
-  const bestSellers = context.storefront
-    .query(HOME_BEST_QUERY)
-    .then((r) => r.best.nodes as CardProduct[])
-    .catch((error: Error) => {
+  const safe = <T,>(p: Promise<T>, fallback: T) =>
+    p.catch((error: Error) => {
       console.error(error);
-      return [] as CardProduct[];
+      return fallback;
     });
-  const universes = context.storefront
-    .query(HOME_COLLECTIONS_QUERY)
-    .then((r) => r.collections.nodes)
-    .catch((error: Error) => {
-      console.error(error);
-      return [];
-    });
-  return {bestSellers, universes};
+  return {
+    bestSellers: safe(
+      context.storefront
+        .query(HOME_BEST_QUERY)
+        .then((r) => r.best.nodes as CardProduct[]),
+      [] as CardProduct[],
+    ),
+    icons: safe(
+      context.storefront
+        .query(HOME_ICONS_QUERY)
+        .then((r) => r.icons.nodes as CardProduct[]),
+      [] as CardProduct[],
+    ),
+    promos: safe(
+      context.storefront
+        .query(HOME_PROMO_QUERY)
+        .then((r) => (r.collection?.products.nodes ?? []) as CardProduct[]),
+      [] as CardProduct[],
+    ),
+  };
 }
 
 export default function Homepage() {
-  const {newest, bestSellers, universes} = useLoaderData<typeof loader>();
+  const {newest, bestSellers, icons, promos} = useLoaderData<typeof loader>();
+  const root = useRouteLoaderData<RootLoader>('root');
+  const menuImages = root?.menuImages ?? Promise.resolve({} as MenuImages);
   const heroProduct = newest[0];
 
   return (
     <div className="home">
-      <Hero product={heroProduct} />
+      <CampaignHero product={heroProduct} />
       <BrandTicker />
 
       <ProductRail
@@ -64,7 +107,11 @@ export default function Homepage() {
         products={newest}
       />
 
-      <section className="universes container" aria-labelledby="univers-title">
+      <section
+        className="universes container"
+        aria-labelledby="univers-title"
+        data-reveal
+      >
         <header className="section-head">
           <div>
             <p className="eyebrow">Trouve ta paire</p>
@@ -72,15 +119,18 @@ export default function Homepage() {
               Quatre univers.
             </h2>
           </div>
+          <Link to="/collections" className="link-arrow hide-sm">
+            Toutes les collections <IconArrow width={16} height={16} />
+          </Link>
         </header>
-        <Suspense fallback={<UniverseGrid collections={[]} />}>
-          <Await resolve={universes}>
-            {(collections) => <UniverseGrid collections={collections} />}
+        <Suspense fallback={<UniverseGrid images={{}} />}>
+          <Await resolve={menuImages}>
+            {(imgs) => <UniverseGrid images={imgs} />}
           </Await>
         </Suspense>
       </section>
 
-      <AuthenticityBand />
+      <StoryBlock story={STORIES[0]} menuImages={menuImages} />
 
       <Suspense fallback={null}>
         <Await resolve={bestSellers}>
@@ -97,22 +147,85 @@ export default function Homepage() {
         </Await>
       </Suspense>
 
+      <Suspense fallback={null}>
+        <Await resolve={icons}>
+          {(products) =>
+            products.length ? (
+              <ProductRail
+                eyebrow="Intemporelles"
+                title="Les icônes"
+                to="/collections/all?sort=best-selling"
+                products={products}
+              />
+            ) : null
+          }
+        </Await>
+      </Suspense>
+
+      <StoryBlock story={STORIES[1]} menuImages={menuImages} />
+
+      <EditorialBand menuImages={menuImages} />
+
+      <Suspense fallback={null}>
+        <Await resolve={promos}>
+          {(products) =>
+            products.length ? (
+              <ProductRail
+                eyebrow="Dernière chance"
+                title="Promos"
+                to="/collections/promo"
+                products={products}
+              />
+            ) : null
+          }
+        </Await>
+      </Suspense>
+
       <BrandIndex />
       <ServiceStrip />
+      <PopularCategories />
     </div>
   );
 }
 
-function Hero({product}: {product?: CardProduct}) {
+/* ---------------- Campaign hero ---------------- */
+function CampaignHero({product}: {product?: CardProduct}) {
   const image = product?.featuredImage;
+  const c = CAMPAIGN;
+  const hasMedia = Boolean(c.video || c.image);
+  const stageRef = useRef<HTMLDivElement>(null);
+
+  // Subtle parallax on the media
+  useEffect(() => {
+    const el = stageRef.current;
+    if (!el || window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+      return;
+    let raf = 0;
+    const onScroll = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(() => {
+        const y = Math.min(window.scrollY, 900);
+        el.style.setProperty('--parallax', `${y * 0.12}px`);
+      });
+    };
+    window.addEventListener('scroll', onScroll, {passive: true});
+    return () => {
+      window.removeEventListener('scroll', onScroll);
+      cancelAnimationFrame(raf);
+    };
+  }, []);
+
   return (
-    <section className="hero" aria-label="À la une">
+    <section
+      className={`hero ${hasMedia ? 'hero--media' : ''} hero--${c.theme ?? 'dark'}`}
+      aria-label="À la une"
+    >
       <div className="hero-copy">
         <p className="eyebrow">
-          <span className="dot" /> {HERO.eyebrow} — {new Date().getFullYear()}
+          <span className="dot" /> {c.eyebrow} — {new Date().getFullYear()}
         </p>
         <h1 className="hero-title">
-          {HERO.title.map((line, i) => (
+          {c.title.map((line, i) => (
             <span
               key={line}
               className="hero-line"
@@ -122,29 +235,37 @@ function Hero({product}: {product?: CardProduct}) {
             </span>
           ))}
         </h1>
-        <p className="hero-lede">{HERO.copy}</p>
+        <p className="hero-lede">{c.copy}</p>
         <div className="hero-ctas">
-          <Link to={HERO.primaryCta.to} className="btn btn--lg">
-            {HERO.primaryCta.label} <IconArrow width={18} height={18} />
+          <Link to={c.primary.to} className="btn btn--lg">
+            {c.primary.label} <IconArrow width={18} height={18} />
           </Link>
-          <Link to={HERO.secondaryCta.to} className="btn btn--lg btn--ghost">
-            {HERO.secondaryCta.label}
-          </Link>
+          {c.secondary ? (
+            <Link to={c.secondary.to} className="btn btn--lg btn--ghost">
+              {c.secondary.label}
+            </Link>
+          ) : null}
         </div>
       </div>
 
-      <div className="hero-stage">
-        {HERO.video ? (
+      <div className="hero-stage" ref={stageRef}>
+        {c.video ? (
           <video
             className="hero-media"
-            src={HERO.video}
+            src={c.video}
+            poster={c.poster}
             autoPlay
             muted
             loop
             playsInline
           />
-        ) : HERO.image ? (
-          <img className="hero-media" src={HERO.image} alt="" />
+        ) : c.image ? (
+          <img
+            className="hero-media"
+            src={c.image}
+            alt=""
+            fetchPriority="high"
+          />
         ) : image ? (
           <Image
             className="hero-product"
@@ -170,11 +291,15 @@ function Hero({product}: {product?: CardProduct}) {
             </span>
           </Link>
         ) : null}
+        <span className="hero-scroll" aria-hidden>
+          <span />
+        </span>
       </div>
     </section>
   );
 }
 
+/* ---------------- Brand ticker ---------------- */
 function BrandTicker() {
   const row = [...BRANDS, ...BRANDS];
   return (
@@ -205,62 +330,19 @@ function BrandTicker() {
   );
 }
 
-type UniverseCollection = {
-  handle: string;
-  title: string;
-  image?: {
-    url: string;
-    altText?: string | null;
-    width?: number | null;
-    height?: number | null;
-  } | null;
-  products: {
-    nodes: {
-      featuredImage?: {
-        url: string;
-        altText?: string | null;
-        width?: number | null;
-        height?: number | null;
-      } | null;
-    }[];
-  };
-};
-
-function UniverseGrid({collections}: {collections: UniverseCollection[]}) {
+/* ---------------- Universes ---------------- */
+function UniverseGrid({images}: {images: MenuImages}) {
   return (
     <div className="universe-grid">
-      {CATEGORIES.map((cat) => {
-        const c = collections.find((x) => x.handle === cat.handle);
-        const img = c?.image ?? c?.products.nodes[0]?.featuredImage;
-        if (cat.image) {
-          return (
-            <Link
-              key={cat.handle}
-              to={`/collections/${cat.handle}`}
-              className="universe"
-            >
-              <img
-                src={cat.image}
-                alt=""
-                className="universe-img"
-                loading="lazy"
-              />
-              <span className="universe-kicker">{cat.kicker}</span>
-              <span className="universe-body">
-                <span className="universe-title">{cat.title}</span>
-                <span className="universe-copy">{cat.copy}</span>
-              </span>
-              <span className="universe-arrow">
-                <IconArrow />
-              </span>
-            </Link>
-          );
-        }
+      {CATEGORIES.map((cat, i) => {
+        const img = cat.image ? {url: cat.image} : images[cat.handle];
         return (
           <Link
             key={cat.handle}
             to={`/collections/${cat.handle}`}
             className="universe"
+            data-reveal
+            style={{['--d' as string]: `${i * 80}ms`}}
           >
             {img ? (
               <Image
@@ -288,7 +370,62 @@ function UniverseGrid({collections}: {collections: UniverseCollection[]}) {
   );
 }
 
-function AuthenticityBand() {
+/* ---------------- Story block ---------------- */
+function StoryBlock({
+  story,
+  menuImages,
+}: {
+  story?: Story;
+  menuImages: Promise<MenuImages>;
+}) {
+  if (!story) return null;
+  return (
+    <section
+      className={`story story--${story.align ?? 'left'} story--${story.theme ?? 'paper'}`}
+      aria-label={story.title}
+      data-reveal
+    >
+      <div className="story-media">
+        <Suspense fallback={null}>
+          <Await resolve={menuImages}>
+            {(imgs) => {
+              const img = story.image ? {url: story.image} : imgs[story.handle];
+              return img ? (
+                <Image
+                  data={img}
+                  alt=""
+                  sizes="(min-width: 64em) 60vw, 100vw"
+                  loading="lazy"
+                />
+              ) : (
+                <span className="story-media-empty" />
+              );
+            }}
+          </Await>
+        </Suspense>
+      </div>
+      <div className="story-copy">
+        <p className="eyebrow">{story.kicker}</p>
+        <h2 className="display-l">{story.title}</h2>
+        <p className="story-text">{story.copy}</p>
+        <div className="story-ctas">
+          {story.ctas.map((c, i) => (
+            <Link
+              key={c.label}
+              to={c.to}
+              className={`btn ${i ? 'btn--ghost' : ''}`}
+            >
+              {c.label} {i === 0 ? <IconArrow width={16} height={16} /> : null}
+            </Link>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+/* ---------------- Editorial band ---------------- */
+function EditorialBand({menuImages}: {menuImages: Promise<MenuImages>}) {
   const steps = [
     {
       n: '01',
@@ -307,15 +444,33 @@ function AuthenticityBand() {
     },
   ];
   return (
-    <section className="band" aria-labelledby="band-title">
+    <section className="band" aria-labelledby="band-title" data-reveal>
+      <div className="band-bg" aria-hidden>
+        <Suspense fallback={null}>
+          <Await resolve={menuImages}>
+            {(imgs) => {
+              const img = EDITORIAL.image
+                ? {url: EDITORIAL.image}
+                : (imgs['outdoor'] ?? imgs['all']);
+              return img ? (
+                <Image data={img} alt="" sizes="100vw" loading="lazy" />
+              ) : null;
+            }}
+          </Await>
+        </Suspense>
+      </div>
       <div className="container band-inner">
         <div className="band-head">
-          <p className="eyebrow eyebrow--light">Notre promesse</p>
+          <p className="eyebrow eyebrow--light">{EDITORIAL.kicker}</p>
           <h2 id="band-title" className="display-l">
             Vérifiée à la main.
             <br />
             <span className="outline">Portée sans doute.</span>
           </h2>
+          <p className="band-copy">{EDITORIAL.copy}</p>
+          <Link to={EDITORIAL.cta.to} className="btn btn--light">
+            {EDITORIAL.cta.label} <IconArrow width={16} height={16} />
+          </Link>
         </div>
         <ol className="band-steps">
           {steps.map((s) => (
@@ -331,9 +486,14 @@ function AuthenticityBand() {
   );
 }
 
+/* ---------------- Brand index ---------------- */
 function BrandIndex() {
   return (
-    <section className="brand-index container" aria-labelledby="brands-title">
+    <section
+      className="brand-index container"
+      aria-labelledby="brands-title"
+      data-reveal
+    >
       <header className="section-head">
         <div>
           <p className="eyebrow">Index</p>
@@ -370,6 +530,26 @@ function BrandIndex() {
   );
 }
 
+/* ---------------- Popular categories (SEO) ---------------- */
+function PopularCategories() {
+  return (
+    <section className="popular container" aria-labelledby="popular-title">
+      <h2 id="popular-title" className="popular-title">
+        Catégories les plus recherchées
+      </h2>
+      <ul className="popular-list">
+        {POPULAR_CATEGORIES.map((c) => (
+          <li key={c.to + c.label}>
+            <Link to={c.to} prefetch="intent">
+              {c.label}
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </section>
+  );
+}
+
 const HOME_NEWEST_QUERY = `#graphql
   query HomeNewest($country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
@@ -394,30 +574,29 @@ const HOME_BEST_QUERY = `#graphql
   ${PRODUCT_CARD_FRAGMENT}
 ` as const;
 
-const HOME_COLLECTIONS_QUERY = `#graphql
-  query HomeCollections($country: CountryCode, $language: LanguageCode)
+/** Tag products with `icone` in Shopify to feature them in "Les icônes". */
+const HOME_ICONS_QUERY = `#graphql
+  query HomeIcons($country: CountryCode, $language: LanguageCode)
   @inContext(country: $country, language: $language) {
-    collections(first: 100) {
+    icons: products(first: 12, sortKey: BEST_SELLING, query: "tag:icone") {
       nodes {
-        handle
-        title
-        image {
-          url
-          altText
-          width
-          height
-        }
-        products(first: 1) {
-          nodes {
-            featuredImage {
-              url
-              altText
-              width
-              height
-            }
-          }
+        ...ProductCard
+      }
+    }
+  }
+  ${PRODUCT_CARD_FRAGMENT}
+` as const;
+
+const HOME_PROMO_QUERY = `#graphql
+  query HomePromo($country: CountryCode, $language: LanguageCode)
+  @inContext(country: $country, language: $language) {
+    collection(handle: "promo") {
+      products(first: 12) {
+        nodes {
+          ...ProductCard
         }
       }
     }
   }
+  ${PRODUCT_CARD_FRAGMENT}
 ` as const;

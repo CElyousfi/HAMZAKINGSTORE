@@ -39,50 +39,38 @@ export default function AccountLayout() {
 
   const heading = customer
     ? customer.firstName
-      ? `Welcome, ${customer.firstName}`
-      : `Welcome to your account.`
-    : 'Account Details';
+      ? `Salam, ${customer.firstName}.`
+      : `Bienvenue dans ton espace.`
+    : 'Mon compte';
 
   return (
-    <div className="account">
-      <h1>{heading}</h1>
-      <br />
+    <div className="account container">
+      <header className="page-head page-head--tight">
+        <p className="eyebrow">Mon compte</p>
+        <h1 className="display-l">{heading}</h1>
+      </header>
       <AccountMenu />
-      <br />
-      <br />
-      <Outlet context={{customer}} />
+      <div className="account-body">
+        <Outlet context={{customer}} />
+      </div>
     </div>
   );
 }
 
 function AccountMenu() {
-  function isActiveStyle({
-    isActive,
-    isPending,
-  }: {
-    isActive: boolean;
-    isPending: boolean;
-  }) {
-    return {
-      fontWeight: isActive ? 'bold' : undefined,
-      color: isPending ? 'grey' : 'black',
-    };
-  }
-
+  const cls = ({isActive}: {isActive: boolean}) =>
+    `account-tab ${isActive ? 'is-active' : ''}`;
   return (
-    <nav role="navigation">
-      <NavLink to="/account/orders" style={isActiveStyle}>
-        Orders &nbsp;
+    <nav className="account-nav" aria-label="Compte">
+      <NavLink to="/account/orders" className={cls}>
+        Commandes
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/profile" style={isActiveStyle}>
-        &nbsp; Profile &nbsp;
+      <NavLink to="/account/profile" className={cls}>
+        Profil
       </NavLink>
-      &nbsp;|&nbsp;
-      <NavLink to="/account/addresses" style={isActiveStyle}>
-        &nbsp; Addresses &nbsp;
+      <NavLink to="/account/addresses" className={cls}>
+        Adresses
       </NavLink>
-      &nbsp;|&nbsp;
       <Logout />
     </nav>
   );
@@ -91,7 +79,9 @@ function AccountMenu() {
 function Logout() {
   return (
     <Form className="account-logout" method="POST" action="/account/logout">
-      &nbsp;<button type="submit">Sign out</button>
+      <button type="submit" className="link-btn">
+        Se déconnecter
+      </button>
     </Form>
   );
 }

@@ -97,18 +97,18 @@ function EmptyOrders({hasFilters = false}: {hasFilters?: boolean}) {
     <div>
       {hasFilters ? (
         <>
-          <p>No orders found matching your search.</p>
+          <p>Aucune commande ne correspond à ta recherche.</p>
           <br />
           <p>
-            <Link to="/account/orders">Clear filters →</Link>
+            <Link to="/account/orders">Effacer les filtres →</Link>
           </p>
         </>
       ) : (
         <>
-          <p>You haven&apos;t placed any orders yet.</p>
+          <p>Tu n’as pas encore passé de commande.</p>
           <br />
           <p>
-            <Link to="/collections">Start Shopping →</Link>
+            <Link to="/collections">Commencer mes achats →</Link>
           </p>
         </>
       )}
@@ -153,16 +153,16 @@ function OrderSearchForm({
       ref={formRef}
       onSubmit={handleSubmit}
       className="order-search-form"
-      aria-label="Search orders"
+      aria-label="Rechercher une commande"
     >
       <fieldset className="order-search-fieldset">
-        <legend className="order-search-legend">Filter Orders</legend>
+        <legend className="order-search-legend">Filtrer les commandes</legend>
 
         <div className="order-search-inputs">
           <input
             type="search"
             name={ORDER_FILTER_FIELDS.NAME}
-            placeholder="Order #"
+            placeholder="N° de commande"
             aria-label="Order number"
             defaultValue={currentFilters.name || ''}
             className="order-search-input"
@@ -170,7 +170,7 @@ function OrderSearchForm({
           <input
             type="search"
             name={ORDER_FILTER_FIELDS.CONFIRMATION_NUMBER}
-            placeholder="Confirmation #"
+            placeholder="N° de confirmation"
             aria-label="Confirmation number"
             defaultValue={currentFilters.confirmationNumber || ''}
             className="order-search-input"
@@ -214,7 +214,7 @@ function OrderItem({order}: {order: OrderItemFragment}) {
         <p>{order.financialStatus}</p>
         {fulfillmentStatus && <p>{fulfillmentStatus}</p>}
         <Money data={order.totalPrice} />
-        <Link to={`/account/orders/${btoa(order.id)}`}>View Order →</Link>
+        <Link to={`/account/orders/${btoa(order.id)}`}>Voir la commande →</Link>
       </fieldset>
       <br />
     </>

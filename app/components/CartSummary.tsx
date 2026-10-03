@@ -2,7 +2,8 @@ import type {CartApiQueryFragment} from 'storefrontapi.generated';
 import type {CartLayout} from '~/components/CartMain';
 import {CartForm, type OptimisticCart} from '@shopify/hydrogen';
 import {formatMoney} from './Price';
-import {IconArrow, IconCash, IconShield} from './Icons';
+import {IconArrow, IconCash, IconShield, IconWhatsApp} from './Icons';
+import {whatsappLink} from '~/lib/config';
 import {useEffect, useId, useRef, useState} from 'react';
 import {useFetcher} from 'react-router';
 
@@ -52,7 +53,23 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
           <dd className="muted">Calculée à l’étape suivante</dd>
         </div>
       </dl>
+      <CartNote note={cart?.note ?? ''} />
       <CartCheckoutActions checkoutUrl={cart?.checkoutUrl} />
+      <a
+        className="btn btn--block btn--wa"
+        href={whatsappLink(
+          `Salam ! Je veux commander :\n${(cart?.lines?.nodes ?? [])
+            .map(
+              (l) =>
+                `• ${l.merchandise.product.title} — ${l.merchandise.title} ×${l.quantity}`,
+            )
+            .join('\n')}`,
+        )}
+        target="_blank"
+        rel="noreferrer"
+      >
+        <IconWhatsApp /> Commander sur WhatsApp
+      </a>
       <ul className="cart-assurances">
         <li>
           <IconCash width={16} height={16} /> Paiement à la livraison disponible
@@ -62,6 +79,29 @@ export function CartSummary({cart, layout}: CartSummaryProps) {
         </li>
       </ul>
     </div>
+  );
+}
+
+function CartNote({note}: {note: string}) {
+  const id = useId();
+  return (
+    <details className="cart-codes" open={Boolean(note)}>
+      <summary>Ajouter une note à ma commande</summary>
+      <CartForm route="/cart" action={CartForm.ACTIONS.NoteUpdate}>
+        <div>
+          <label htmlFor={id} className="sr-only">
+            Note
+          </label>
+          <input
+            id={id}
+            name="note"
+            defaultValue={note}
+            placeholder="Ex. : appeler avant la livraison"
+          />
+          <button type="submit">OK</button>
+        </div>
+      </CartForm>
+    </details>
   );
 }
 

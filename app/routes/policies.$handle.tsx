@@ -45,15 +45,21 @@ export default function Policy() {
   const {policy} = useLoaderData<typeof loader>();
 
   return (
-    <div className="policy">
+    <div className="policy container">
       <br />
       <br />
       <div>
-        <Link to="/policies">← Back to Policies</Link>
+        <Link to="/policies">← Toutes les conditions</Link>
       </div>
       <br />
-      <h1>{policy.title}</h1>
-      <div dangerouslySetInnerHTML={{__html: policy.body}} />
+      <header className="page-head page-head--tight">
+        <p className="eyebrow">Informations légales</p>
+        <h1 className="display-l">{policy.title}</h1>
+      </header>
+      <div
+        className="rte page-body"
+        dangerouslySetInnerHTML={{__html: policy.body}}
+      />
     </div>
   );
 }

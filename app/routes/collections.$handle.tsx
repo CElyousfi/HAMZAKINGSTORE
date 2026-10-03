@@ -16,8 +16,15 @@ import {
 
 export const meta: Route.MetaFunction = ({data}) => {
   return [
-    {title: `HAMZA KING | ${data?.collection.title ?? ''}`},
-    {name: 'description', content: data?.collection.description ?? ''},
+    {
+      title: `HAMZA KING | ${data?.collection.seo?.title || data?.collection.title || ''}`,
+    },
+    {
+      name: 'description',
+      content:
+        data?.collection.seo?.description || data?.collection.description || '',
+    },
+    {property: 'og:image', content: data?.collection.image?.url ?? ''},
   ];
 };
 
@@ -63,6 +70,8 @@ export default function Collection() {
         }}
         filters={collection.products.filters as Filter[]}
         sort={sort}
+        handle={collection.handle}
+        image={collection.image}
       />
       <Analytics.CollectionView
         data={{collection: {id: collection.id, handle: collection.handle}}}
@@ -91,6 +100,16 @@ const COLLECTION_QUERY = `#graphql
       handle
       title
       description
+      image {
+        url
+        altText
+        width
+        height
+      }
+      seo {
+        title
+        description
+      }
       products(
         first: $first
         last: $last

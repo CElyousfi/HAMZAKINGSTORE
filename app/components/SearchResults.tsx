@@ -1,5 +1,6 @@
 import {Link} from 'react-router';
-import {Image, Money, Pagination} from '@shopify/hydrogen';
+import {ProductItem, type CardProduct} from './ProductItem';
+import {Image, Pagination} from '@shopify/hydrogen';
 import {urlWithTrackingParams, type RegularSearchReturn} from '~/lib/search';
 
 type SearchItems = RegularSearchReturn['result']['items'];
@@ -100,58 +101,30 @@ function SearchResultsProducts({
   if (!products?.nodes.length) {
     return null;
   }
-
+  void term;
   return (
-    <div className="search-result">
-      <h2>Produits</h2>
+    <div className="search-result search-result--products">
       <Pagination connection={products}>
-        {({nodes, isLoading, NextLink, PreviousLink}) => {
-          const ItemsMarkup = nodes.map((product) => {
-            const productUrl = urlWithTrackingParams({
-              baseUrl: `/products/${product.handle}`,
-              trackingParams: product.trackingParameters,
-              term,
-            });
-
-            const price = product?.selectedOrFirstAvailableVariant?.price;
-            const image = product?.selectedOrFirstAvailableVariant?.image;
-
-            return (
-              <div className="search-results-item" key={product.id}>
-                <Link prefetch="intent" to={productUrl}>
-                  {image && (
-                    <Image data={image} alt={product.title} width={50} />
-                  )}
-                  <div>
-                    <p>{product.title}</p>
-                    <small>{price && <Money data={price} />}</small>
-                  </div>
-                </Link>
-              </div>
-            );
-          });
-
-          return (
-            <div>
-              <div>
-                <PreviousLink>
-                  {isLoading ? 'Loading...' : <span>↑ Load previous</span>}
-                </PreviousLink>
-              </div>
-              <div>
-                {ItemsMarkup}
-                <br />
-              </div>
-              <div>
-                <NextLink>
-                  {isLoading ? 'Loading...' : <span>Load more ↓</span>}
-                </NextLink>
-              </div>
+        {({nodes, isLoading, NextLink, PreviousLink}) => (
+          <div className="paginated">
+            <PreviousLink className="load-more load-more--prev">
+              {isLoading ? 'Chargement…' : 'Afficher les précédents'}
+            </PreviousLink>
+            <div className="grid">
+              {nodes.map((product, i) => (
+                <ProductItem
+                  key={product.id}
+                  product={product as unknown as CardProduct}
+                  loading={i < 8 ? 'eager' : 'lazy'}
+                />
+              ))}
             </div>
-          );
-        }}
+            <NextLink className="load-more">
+              {isLoading ? 'Chargement…' : 'Afficher plus'}
+            </NextLink>
+          </div>
+        )}
       </Pagination>
-      <br />
     </div>
   );
 }

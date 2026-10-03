@@ -69,26 +69,33 @@ export default function Article() {
   const {article} = useLoaderData<typeof loader>();
   const {title, image, contentHtml, author} = article;
 
-  const publishedDate = new Intl.DateTimeFormat('en-US', {
+  const publishedDate = new Intl.DateTimeFormat('fr-FR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',
   }).format(new Date(article.publishedAt));
 
   return (
-    <div className="article">
-      <h1>
-        {title}
-        <div>
-          <time dateTime={article.publishedAt}>{publishedDate}</time> &middot;{' '}
-          <address>{author?.name}</address>
+    <div className="article container">
+      <header className="page-head page-head--tight article-head">
+        <p className="eyebrow">
+          <time dateTime={article.publishedAt}>{publishedDate}</time>
+          {author?.name ? <> · {author.name}</> : null}
+        </p>
+        <h1 className="display-l">{title}</h1>
+      </header>
+      {image && (
+        <div className="article-image">
+          <Image
+            data={image}
+            sizes="(min-width: 64em) 1200px, 100vw"
+            loading="eager"
+          />
         </div>
-      </h1>
-
-      {image && <Image data={image} sizes="90vw" loading="eager" />}
+      )}
       <div
         dangerouslySetInnerHTML={{__html: contentHtml}}
-        className="article"
+        className="rte article-body"
       />
     </div>
   );

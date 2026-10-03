@@ -10,91 +10,133 @@ import {
 } from '@shopify/hydrogen';
 import {Suspense, useEffect, useRef, useState} from 'react';
 import {Await, Link} from 'react-router';
-import {Price} from '~/components/Price';
+import {Price, formatMoney} from '~/components/Price';
 import {ProductForm} from '~/components/ProductForm';
 import {ProductGallery} from '~/components/ProductGallery';
 import {ProductRail} from '~/components/ProductRail';
+import {RecentlyViewed} from '~/components/RecentlyViewed';
+import {WishlistButton} from '~/components/WishlistButton';
 import {
   PRODUCT_CARD_FRAGMENT,
+  productSubtitle,
   type CardProduct,
 } from '~/components/ProductItem';
 import {
+  IconBolt,
   IconCash,
-  IconReturn,
-  IconShield,
-  IconTruck,
   IconChevron,
+  IconCushion,
+  IconDrop,
+  IconFeather,
+  IconGrip,
+  IconReturn,
+  IconShare,
+  IconShield,
+  IconStar,
+  IconTruck,
+  IconWhatsApp,
 } from '~/components/Icons';
-import {SHIPPING} from '~/lib/config';
+import {BRAND, SHIPPING, whatsappLink} from '~/lib/config';
+import {
+  BENEFITS_BY_TAG,
+  DELIVERY_ROWS,
+  SITE,
+  type Benefit,
+} from '~/lib/content';
+import {pushRecentlyViewed} from '~/lib/ui';
 import {redirectIfHandleIsLocalized} from '~/lib/redirect';
 
 export const meta: Route.MetaFunction = ({data}) => {
+  const p = data?.product;
+  if (!p) return [{title: BRAND.name}];
+  const title = `${p.seo?.title || p.title} | ${BRAND.name}`;
+  const description = p.seo?.description || p.description?.slice(0, 155) || '';
+  const image = p.images?.nodes?.[0]?.url ?? '';
+  const variant = p.selectedOrFirstAvailableVariant;
   return [
-    {title: `HAMZA KING | ${data?.product.title ?? ''}`},
+    {title},
+    {name: 'description', content: description},
+    {property: 'og:title', content: title},
+    {property: 'og:description', content: description},
+    {property: 'og:image', content: image},
+    {property: 'og:type', content: 'product'},
+    {property: 'product:price:amount', content: variant?.price.amount ?? ''},
     {
-      name: 'description',
-      content:
-        data?.product.seo?.description ||
-        data?.product.description?.slice(0, 155) ||
-        '',
+      property: 'product:price:currency',
+      content: variant?.price.currencyCode ?? 'MAD',
     },
     {
-      property: 'og:image',
-      content: data?.product.images?.nodes?.[0]?.url ?? '',
-    },
-    {
+      tagName: 'link',
       rel: 'canonical',
-      href: `/products/${data?.product.handle}`,
+      href: `${SITE.url}/products/${p.handle}`,
+    },
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'Product',
+        name: p.title,
+        brand: {'@type': 'Brand', name: p.vendor},
+        description: p.description,
+        image: p.images?.nodes?.map((i) => i.url) ?? [],
+        sku: variant?.sku ?? undefined,
+        url: `${SITE.url}/products/${p.handle}`,
+        offers: {
+          '@type': 'AggregateOffer',
+          priceCurrency: p.priceRange?.minVariantPrice?.currencyCode ?? 'MAD',
+          lowPrice: p.priceRange?.minVariantPrice?.amount,
+          highPrice: p.priceRange?.maxVariantPrice?.amount,
+          availability: variant?.availableForSale
+            ? 'https://schema.org/InStock'
+            : 'https://schema.org/OutOfStock',
+          url: `${SITE.url}/products/${p.handle}`,
+          seller: {'@type': 'Organization', name: BRAND.name},
+        },
+      },
+    },
+    {
+      'script:ld+json': {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {'@type': 'ListItem', position: 1, name: 'Accueil', item: SITE.url},
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: p.vendor,
+            item: `${SITE.url}/collections/${vendorHandle(p.vendor)}`,
+          },
+          {'@type': 'ListItem', position: 3, name: p.title},
+        ],
+      },
     },
   ];
 };
 
+function vendorHandle(vendor: string) {
+  return vendor.toLowerCase().replace(/\s+/g, '-');
+}
+
 export async function loader(args: Route.LoaderArgs) {
-  // Start fetching non-critical data without blocking time to first byte
   const deferredData = loadDeferredData(args);
-
-  // Await the critical data required to render initial state of the page
   const criticalData = await loadCriticalData(args);
-
   return {...deferredData, ...criticalData};
 }
 
-/**
- * Load data necessary for rendering content above the fold. This is the critical data
- * needed to render the page. If it's unavailable, the whole page should 400 or 500 error.
- */
 async function loadCriticalData({context, params, request}: Route.LoaderArgs) {
   const {handle} = params;
   const {storefront} = context;
-
-  if (!handle) {
-    throw new Error('Expected product handle to be defined');
-  }
+  if (!handle) throw new Error('Expected product handle to be defined');
 
   const [{product}] = await Promise.all([
     storefront.query(PRODUCT_QUERY, {
       variables: {handle, selectedOptions: getSelectedProductOptions(request)},
     }),
-    // Add other queries here, so that they are loaded in parallel
   ]);
-
-  if (!product?.id) {
-    throw new Response(null, {status: 404});
-  }
-
-  // The API handle might be localized, so redirect to the localized handle
+  if (!product?.id) throw new Response(null, {status: 404});
   redirectIfHandleIsLocalized(request, {handle, data: product});
-
-  return {
-    product,
-  };
+  return {product};
 }
 
-/**
- * Load data for rendering content below the fold. This data is deferred and will be
- * fetched after the initial page load. If it's unavailable, the page should still 200.
- * Make sure to not throw any errors here, as it will cause the page to 500.
- */
 function loadDeferredData({context, params}: Route.LoaderArgs) {
   const recommended = context.storefront
     .query(RECOMMENDATIONS_QUERY, {variables: {handle: params.handle!}})
@@ -105,6 +147,30 @@ function loadDeferredData({context, params}: Route.LoaderArgs) {
     });
   return {recommended};
 }
+
+/* ---------- metafield helpers ---------- */
+type Metafield = {key: string; value: string} | null;
+function mf(fields: Metafield[], key: string) {
+  return fields.find((f) => f?.key === key)?.value ?? '';
+}
+function mfJson<T>(fields: Metafield[], key: string, fallback: T): T {
+  const raw = mf(fields, key);
+  if (!raw) return fallback;
+  try {
+    return JSON.parse(raw) as T;
+  } catch {
+    return fallback;
+  }
+}
+
+const BENEFIT_ICONS = {
+  cushion: IconCushion,
+  grip: IconGrip,
+  feather: IconFeather,
+  drop: IconDrop,
+  bolt: IconBolt,
+  shield: IconShield,
+};
 
 export default function Product() {
   const {product, recommended} = useLoaderData<typeof loader>();
@@ -120,14 +186,55 @@ export default function Product() {
   });
 
   const {title, descriptionHtml, vendor} = product;
+  const fields = (product.metafields ?? []) as Metafield[];
+  const subtitle = productSubtitle(product as unknown as CardProduct);
+  const tags = (product.tags ?? []).map((t) => t.toLowerCase());
+  const categoryTag = ['running', 'lifestyle', 'basketball', 'outdoor'].find(
+    (t) => tags.includes(t),
+  );
+  const benefits = mfJson<Benefit[]>(
+    fields,
+    'benefits',
+    BENEFITS_BY_TAG[categoryTag ?? 'default'],
+  );
+  const fit =
+    mf(fields, 'fit') || 'Taille normalement. Garde ta pointure habituelle.';
+  const specsExtra = mfJson<{label: string; value: string}[]>(
+    fields,
+    'specs',
+    [],
+  );
+  const story = mf(fields, 'story');
 
-  // Put the selected variant image first, then the rest of the product images.
+  const colorValue = selectedVariant?.selectedOptions.find((o) =>
+    ['couleur', 'color', 'colour', 'coloris'].includes(o.name.toLowerCase()),
+  )?.value;
+
+  const specs = [
+    {
+      label: 'Référence',
+      value: selectedVariant?.sku || product.handle.toUpperCase(),
+    },
+    {label: 'Marque', value: vendor},
+    {label: 'Catégorie', value: subtitle},
+    ...(colorValue ? [{label: 'Coloris', value: colorValue}] : []),
+    ...(mf(fields, 'weight')
+      ? [{label: 'Poids', value: mf(fields, 'weight')}]
+      : []),
+    ...(mf(fields, 'drop') ? [{label: 'Drop', value: mf(fields, 'drop')}] : []),
+    ...specsExtra,
+  ];
+
+  // Selected variant image first, then the rest.
   const images = (() => {
     const all = product.images.nodes;
     const v = selectedVariant?.image;
     if (!v) return all;
     return [v, ...all.filter((i) => i.url !== v.url)];
   })();
+
+  const qty = selectedVariant?.quantityAvailable ?? null;
+  const lowStock = qty !== null && qty > 0 && qty <= 5;
 
   const buyRef = useRef<HTMLDivElement>(null);
   const [showSticky, setShowSticky] = useState(false);
@@ -140,6 +247,37 @@ export default function Product() {
     io.observe(el);
     return () => io.disconnect();
   }, []);
+  useEffect(() => {
+    pushRecentlyViewed(product.handle);
+  }, [product.handle]);
+
+  const [shareState, setShareState] = useState<'idle' | 'copied'>('idle');
+  const share = async () => {
+    const url = window.location.href;
+    if (navigator.share) {
+      try {
+        await navigator.share({title, url});
+        return;
+      } catch {
+        /* cancelled */
+      }
+    }
+    try {
+      await navigator.clipboard.writeText(url);
+      setShareState('copied');
+      setTimeout(() => setShareState('idle'), 1800);
+    } catch {
+      window.open(whatsappLink(`${title} — ${url}`), '_blank');
+    }
+  };
+
+  const wishItem = {
+    handle: product.handle,
+    title,
+    vendor,
+    image: images[0]?.url,
+    price: selectedVariant?.price,
+  };
 
   return (
     <div className="pdp">
@@ -148,11 +286,7 @@ export default function Product() {
         <span>/</span>
         {vendor ? (
           <>
-            <Link
-              to={`/collections/${vendor.toLowerCase().replace(/\s+/g, '-')}`}
-            >
-              {vendor}
-            </Link>
+            <Link to={`/collections/${vendorHandle(vendor)}`}>{vendor}</Link>
             <span>/</span>
           </>
         ) : null}
@@ -165,16 +299,53 @@ export default function Product() {
         <div className="pdp-panel">
           <div className="pdp-panel-inner" ref={buyRef}>
             <div className="pdp-head">
-              {vendor ? <p className="pdp-vendor">{vendor}</p> : null}
+              <div className="pdp-head-row">
+                {vendor ? (
+                  <Link
+                    to={`/collections/${vendorHandle(vendor)}`}
+                    className="pdp-vendor"
+                  >
+                    {vendor}
+                  </Link>
+                ) : null}
+                <div className="pdp-head-actions">
+                  <button
+                    className="icon-btn"
+                    onClick={share}
+                    aria-label="Partager"
+                  >
+                    <IconShare />
+                    {shareState === 'copied' ? (
+                      <span className="pdp-copied">Lien copié</span>
+                    ) : null}
+                  </button>
+                  <WishlistButton item={wishItem} className="icon-btn" />
+                </div>
+              </div>
               <h1 className="pdp-title">{title}</h1>
-              <Price
-                price={selectedVariant?.price}
-                compareAtPrice={selectedVariant?.compareAtPrice}
-                className="pdp-price"
-              />
+              <p className="pdp-sub">{subtitle}</p>
+              <div className="pdp-price-row">
+                <Price
+                  price={selectedVariant?.price}
+                  compareAtPrice={selectedVariant?.compareAtPrice}
+                  className="pdp-price"
+                />
+                <a
+                  href="#avis"
+                  className="pdp-rating"
+                  aria-label="Voir les avis"
+                >
+                  <span className="stars" aria-hidden>
+                    {[0, 1, 2, 3, 4].map((i) => (
+                      <IconStar key={i} width={14} height={14} filled={false} />
+                    ))}
+                  </span>
+                  <span>Aucun avis pour le moment</span>
+                </a>
+              </div>
               <p className="pdp-cod">
-                <IconCash width={16} height={16} /> Payable à la livraison ·
-                Livraison {SHIPPING.deliveryCasablanca} à Casablanca
+                <IconCash width={16} height={16} /> Payable à la livraison ·{' '}
+                {SHIPPING.deliveryCasablanca} à Casablanca
               </p>
             </div>
 
@@ -182,6 +353,14 @@ export default function Product() {
               productOptions={productOptions}
               selectedVariant={selectedVariant}
               productTitle={title}
+              fitNote={fit}
+              stockMessage={
+                !selectedVariant?.availableForSale
+                  ? 'Cette pointure est épuisée. Choisis-en une autre ou écris-nous : on te prévient dès le retour en stock.'
+                  : lowStock
+                    ? `Plus que ${qty} en stock dans cette pointure.`
+                    : ''
+              }
             />
 
             <ul className="pdp-perks">
@@ -190,62 +369,141 @@ export default function Product() {
                 <span>
                   <strong>Livraison partout au Maroc</strong>
                   {SHIPPING.deliveryCasablanca} Casablanca ·{' '}
-                  {SHIPPING.deliveryMorocco} autres villes
+                  {SHIPPING.deliveryMorocco} autres villes · offerte dès{' '}
+                  {SHIPPING.freeShippingThreshold} DH
                 </span>
               </li>
               <li>
                 <IconReturn />
                 <span>
                   <strong>Échange sous {SHIPPING.returnDays} jours</strong>
-                  Pas la bonne pointure ? On l’échange.
+                  Pas la bonne pointure ? On l’échange, on vient la chercher.
                 </span>
               </li>
               <li>
                 <IconShield />
                 <span>
                   <strong>Authenticité garantie</strong>
-                  Contrôle en 12 points avant expédition.
+                  Contrôle en 12 points avant expédition, ou remboursée.
                 </span>
               </li>
             </ul>
 
             <div className="accordions">
               <Accordion title="Description" defaultOpen>
+                {story ? <p className="pdp-story">{story}</p> : null}
                 <div
                   className="rte"
                   dangerouslySetInnerHTML={{__html: descriptionHtml}}
                 />
               </Accordion>
+              <Accordion title="Caractéristiques">
+                <dl className="specs">
+                  {specs.map((s) => (
+                    <div key={s.label}>
+                      <dt>{s.label}</dt>
+                      <dd>{s.value}</dd>
+                    </div>
+                  ))}
+                </dl>
+              </Accordion>
               <Accordion title="Livraison & paiement">
+                <table className="delivery">
+                  <thead>
+                    <tr>
+                      <th>Zone</th>
+                      <th>Délai</th>
+                      <th>Frais</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {DELIVERY_ROWS.map((r) => (
+                      <tr key={r.zone}>
+                        <td>{r.zone}</td>
+                        <td>{r.delay}</td>
+                        <td>
+                          {r.price}
+                          <small> · {r.note}</small>
+                        </td>
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
                 <p>
-                  Livraison à domicile partout au Maroc. Casablanca :{' '}
-                  {SHIPPING.deliveryCasablanca}. Autres villes :{' '}
-                  {SHIPPING.deliveryMorocco}. Livraison offerte dès{' '}
-                  {SHIPPING.freeShippingThreshold} DH.
-                </p>
-                <p>
-                  Paiement en espèces à la livraison ou par carte bancaire en
-                  ligne.
+                  Commande avant 14h : expédiée le jour même. Paiement en
+                  espèces à la livraison ou par carte bancaire en ligne.
                 </p>
               </Accordion>
               <Accordion title="Échanges & retours">
                 <p>
                   Tu as {SHIPPING.returnDays} jours après réception pour
                   échanger ta paire, non portée et dans sa boîte d’origine.
-                  Contacte-nous sur WhatsApp, on s’occupe du reste.
-                </p>
-              </Accordion>
-              <Accordion title="Authenticité">
-                <p>
-                  Nous travaillons uniquement avec des distributeurs officiels
-                  et des revendeurs vérifiés. Chaque paire est inspectée à la
-                  main avant de partir.
+                  Contacte-nous sur WhatsApp, on organise la récupération.
                 </p>
               </Accordion>
             </div>
           </div>
         </div>
       </div>
+
+      {/* Benefits */}
+      <section
+        className="benefits container"
+        aria-label="Bénéfices produit"
+        data-reveal
+      >
+        <div className="benefits-head">
+          <p className="eyebrow">Bénéfices</p>
+          <h2 className="display-s">Pourquoi cette paire.</h2>
+        </div>
+        <ul className="benefits-list">
+          {benefits.map((b) => {
+            const Icon = BENEFIT_ICONS[b.icon] ?? IconShield;
+            return (
+              <li key={b.title}>
+                <span className="benefit-icon">
+                  <Icon width={24} height={24} />
+                </span>
+                <h3>{b.title}</h3>
+                <p>{b.copy}</p>
+              </li>
+            );
+          })}
+        </ul>
+      </section>
+
+      {/* Reviews */}
+      <section
+        className="reviews container"
+        id="avis"
+        aria-labelledby="reviews-title"
+        data-reveal
+      >
+        <div className="reviews-head">
+          <div>
+            <p className="eyebrow">Avis</p>
+            <h2 id="reviews-title" className="display-s">
+              Ce qu’en disent les clients.
+            </h2>
+          </div>
+          <a
+            className="btn btn--ghost"
+            href={whatsappLink(
+              `Salam ! Je veux laisser un avis sur : ${title}`,
+            )}
+            target="_blank"
+            rel="noreferrer"
+          >
+            <IconWhatsApp /> Donner mon avis
+          </a>
+        </div>
+        <div className="reviews-empty">
+          <p>
+            Pas encore d’avis sur ce modèle. Sois le premier à partager ton
+            expérience.
+          </p>
+        </div>
+      </section>
 
       <Suspense fallback={null}>
         <Await resolve={recommended}>
@@ -261,16 +519,17 @@ export default function Product() {
         </Await>
       </Suspense>
 
+      <RecentlyViewed exclude={product.handle} />
+
       <div
         className={`sticky-buy ${showSticky ? 'is-visible' : ''}`}
         aria-hidden={!showSticky}
       >
         <div className="sticky-buy-info">
           <span className="sticky-buy-title">{title}</span>
-          <Price
-            price={selectedVariant?.price}
-            compareAtPrice={selectedVariant?.compareAtPrice}
-          />
+          <span className="sticky-buy-price">
+            {formatMoney(selectedVariant?.price)}
+          </span>
         </div>
         <button
           className="btn"
@@ -325,6 +584,7 @@ function Accordion({
 const PRODUCT_VARIANT_FRAGMENT = `#graphql
   fragment ProductVariant on ProductVariant {
     availableForSale
+    quantityAvailable
     compareAtPrice {
       amount
       currencyCode
@@ -365,10 +625,22 @@ const PRODUCT_FRAGMENT = `#graphql
     title
     vendor
     handle
+    productType
+    tags
     descriptionHtml
     description
     encodedVariantExistence
     encodedVariantAvailability
+    priceRange {
+      minVariantPrice {
+        amount
+        currencyCode
+      }
+      maxVariantPrice {
+        amount
+        currencyCode
+      }
+    }
     options {
       name
       optionValues {
@@ -401,6 +673,17 @@ const PRODUCT_FRAGMENT = `#graphql
         width
         height
       }
+    }
+    metafields(identifiers: [
+      {namespace: "custom", key: "fit"},
+      {namespace: "custom", key: "benefits"},
+      {namespace: "custom", key: "specs"},
+      {namespace: "custom", key: "story"},
+      {namespace: "custom", key: "weight"},
+      {namespace: "custom", key: "drop"}
+    ]) {
+      key
+      value
     }
     seo {
       description

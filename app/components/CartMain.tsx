@@ -5,6 +5,7 @@ import {useAside} from '~/components/Aside';
 import {CartLineItem, type CartLine} from '~/components/CartLineItem';
 import {SHIPPING} from '~/lib/config';
 import {CartSummary} from './CartSummary';
+import {CartUpsell} from './CartUpsell';
 import {formatMoney} from './Price';
 import {IconArrow, IconBag} from './Icons';
 
@@ -70,6 +71,14 @@ export function CartMain({layout, cart: originalCart}: CartMainProps) {
               );
             })}
           </ul>
+          {layout === 'aside' && cartHasItems ? (
+            <CartUpsell
+              handle={cart?.lines?.nodes?.[0]?.merchandise?.product?.handle}
+              exclude={(cart?.lines?.nodes ?? []).map(
+                (l) => l.merchandise.product.handle,
+              )}
+            />
+          ) : null}
           {cartHasItems && <CartSummary cart={cart} layout={layout} />}
         </>
       )}

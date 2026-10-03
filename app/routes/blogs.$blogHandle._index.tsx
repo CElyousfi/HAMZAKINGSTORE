@@ -65,8 +65,11 @@ export default function Blog() {
   const {articles} = blog;
 
   return (
-    <div className="blog">
-      <h1>{blog.title}</h1>
+    <div className="blog container">
+      <header className="page-head page-head--tight">
+        <p className="eyebrow">Journal</p>
+        <h1 className="display-l">{blog.title}</h1>
+      </header>
       <div className="blog-grid">
         <PaginatedResourceSection<ArticleItemFragment> connection={articles}>
           {({node: article, index}) => (
@@ -89,7 +92,7 @@ function ArticleItem({
   article: ArticleItemFragment;
   loading?: HTMLImageElement['loading'];
 }) {
-  const publishedAt = new Intl.DateTimeFormat('en-US', {
+  const publishedAt = new Intl.DateTimeFormat('fr-FR', {
     year: 'numeric',
     month: 'long',
     day: 'numeric',

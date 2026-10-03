@@ -16,6 +16,31 @@ const ROWS: [string, string, string, string, string][] = [
   ['46', '12', '13.5', '11', '30'],
 ];
 
+export function SizeTable() {
+  return (
+    <table className="size-table">
+      <thead>
+        <tr>
+          <th>EU</th>
+          <th>US H</th>
+          <th>US F</th>
+          <th>UK</th>
+          <th>CM</th>
+        </tr>
+      </thead>
+      <tbody>
+        {ROWS.map((r) => (
+          <tr key={r[0]}>
+            {r.map((c, i) => (
+              <td key={i}>{c}</td>
+            ))}
+          </tr>
+        ))}
+      </tbody>
+    </table>
+  );
+}
+
 export function SizeGuide({
   open,
   onClose,
@@ -56,26 +81,7 @@ export function SizeGuide({
             Mesure ton pied du talon au plus long orteil, en fin de journée.
             Entre deux tailles, prends la plus grande.
           </p>
-          <table>
-            <thead>
-              <tr>
-                <th>EU</th>
-                <th>US H</th>
-                <th>US F</th>
-                <th>UK</th>
-                <th>CM</th>
-              </tr>
-            </thead>
-            <tbody>
-              {ROWS.map((r) => (
-                <tr key={r[0]}>
-                  {r.map((c, i) => (
-                    <td key={i}>{c}</td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
+          <SizeTable />
           <p className="small muted">
             Les tailles peuvent varier légèrement selon la marque et le modèle.
             Un doute ? Écris-nous sur WhatsApp avec ta longueur de pied en cm.

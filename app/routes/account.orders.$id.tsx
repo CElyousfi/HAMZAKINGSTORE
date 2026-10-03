@@ -93,9 +93,9 @@ export default function OrderRoute() {
         <table>
           <thead>
             <tr>
-              <th scope="col">Product</th>
-              <th scope="col">Price</th>
-              <th scope="col">Quantity</th>
+              <th scope="col">Produit</th>
+              <th scope="col">Prix</th>
+              <th scope="col">Quantité</th>
               <th scope="col">Total</th>
             </tr>
           </thead>
@@ -110,10 +110,10 @@ export default function OrderRoute() {
               discountPercentage) && (
               <tr>
                 <th scope="row" colSpan={3}>
-                  <p>Discounts</p>
+                  <p>Remises</p>
                 </th>
                 <th scope="row">
-                  <p>Discounts</p>
+                  <p>Remises</p>
                 </th>
                 <td>
                   {discountPercentage ? (
@@ -126,10 +126,10 @@ export default function OrderRoute() {
             )}
             <tr>
               <th scope="row" colSpan={3}>
-                <p>Subtotal</p>
+                <p>Sous-total</p>
               </th>
               <th scope="row">
-                <p>Subtotal</p>
+                <p>Sous-total</p>
               </th>
               <td>
                 <Money data={order.subtotal!} />
@@ -140,7 +140,7 @@ export default function OrderRoute() {
                 Tax
               </th>
               <th scope="row">
-                <p>Tax</p>
+                <p>Taxes</p>
               </th>
               <td>
                 <Money data={order.totalTax!} />
@@ -160,7 +160,7 @@ export default function OrderRoute() {
           </tfoot>
         </table>
         <div>
-          <h3>Shipping Address</h3>
+          <h3>Adresse de livraison</h3>
           {order?.shippingAddress ? (
             <address>
               <p>{order.shippingAddress.name}</p>
@@ -176,7 +176,7 @@ export default function OrderRoute() {
               )}
             </address>
           ) : (
-            <p>No shipping address defined</p>
+            <p>Aucune adresse de livraison</p>
           )}
           <h3>Status</h3>
           <div>

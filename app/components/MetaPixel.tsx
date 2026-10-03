@@ -1,5 +1,6 @@
 import {useEffect} from 'react';
 import {useAnalytics, useNonce} from '@shopify/hydrogen';
+import {useConsent} from '~/lib/ui';
 
 declare global {
   interface Window {
@@ -17,15 +18,41 @@ export function MetaPixel({pixelId}: {pixelId?: string}) {
   const nonce = useNonce();
   const {subscribe, register} = useAnalytics();
   const {ready} = register('Meta Pixel');
+  const {consent} = useConsent();
+  const enabled = Boolean(pixelId) && consent === 'accepted';
+
+  // Load the pixel script only after consent.
+  useEffect(() => {
+    if (!enabled || window.fbq) return;
+    const id = pixelId!.replace(/[^0-9]/g, '');
+    /* eslint-disable */
+    const f: any = window;
+    const n: any = (f.fbq = function () {
+      n.callMethod ? n.callMethod.apply(n, arguments) : n.queue.push(arguments);
+    });
+    if (!f._fbq) f._fbq = n;
+    n.push = n;
+    n.loaded = true;
+    n.version = '2.0';
+    n.queue = [];
+    const t = document.createElement('script');
+    t.async = true;
+    t.src = 'https://connect.facebook.net/en_US/fbevents.js';
+    document.head.appendChild(t);
+    f.fbq('init', id);
+    f.fbq('track', 'PageView');
+    /* eslint-enable */
+  }, [enabled, pixelId]);
 
   useEffect(() => {
-    if (!pixelId) {
+    if (!enabled) {
       ready();
       return;
     }
 
     const fbq = (...args: unknown[]) => window.fbq?.(...args);
 
+    // PageView is fired on init; route changes:
     subscribe('page_viewed', () => fbq('track', 'PageView'));
 
     subscribe('product_viewed', (data) => {
@@ -73,17 +100,8 @@ export function MetaPixel({pixelId}: {pixelId?: string}) {
     ready();
   }, [pixelId, subscribe, ready]);
 
-  if (!pixelId) return null;
-
-  const snippet = `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');fbq('init','${pixelId.replace(/[^0-9]/g, '')}');`;
-
-  return (
-    <script
-      nonce={nonce}
-      suppressHydrationWarning
-      dangerouslySetInnerHTML={{__html: snippet}}
-    />
-  );
+  void nonce;
+  return null;
 }
 
 /**

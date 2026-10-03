@@ -5,6 +5,7 @@ import {useVariantUrl} from '~/lib/variants';
 import {isColorOption, isSizeOption} from '~/lib/config';
 import {Price} from './Price';
 import {useAside} from './Aside';
+import {WishlistButton} from './WishlistButton';
 
 type Money = {amount: string; currencyCode: string};
 type Img = {
@@ -25,13 +26,17 @@ export type CardProduct = {
   handle: string;
   title: string;
   vendor?: string;
+  productType?: string;
   tags?: string[];
   publishedAt?: string;
   featuredImage?: Img | null;
   images?: {nodes: Img[]};
   priceRange: {minVariantPrice: Money; maxVariantPrice?: Money};
   compareAtPriceRange?: {maxVariantPrice: Money};
-  options?: {name: string; optionValues: {name: string}[]}[];
+  options?: {
+    name: string;
+    optionValues: {name: string; swatch?: {color?: string | null} | null}[];
+  }[];
   variants?: {
     nodes: {
       id: string;
@@ -68,6 +73,69 @@ function getBadge(product: CardProduct) {
   return null;
 }
 
+const GENDER_LABELS: Record<string, string> = {
+  homme: 'Homme',
+  femme: 'Femme',
+  enfant: 'Enfant',
+  junior: 'Junior',
+  bebe: 'Bébé',
+};
+
+/** "Sneakers · Homme" style subtitle built from product type + gender tags. */
+export function productSubtitle(product: CardProduct) {
+  const tags = (product.tags ?? []).map((t) => t.toLowerCase());
+  const genders = Object.keys(GENDER_LABELS).filter((g) => tags.includes(g));
+  const gender =
+    genders.length > 1
+      ? 'Unisexe'
+      : genders.length === 1
+        ? GENDER_LABELS[genders[0]]
+        : '';
+  const type = product.productType || 'Sneakers';
+  return [type, gender].filter(Boolean).join(' · ');
+}
+
+const COLOR_WORDS: Record<string, string> = {
+  noir: '#141210',
+  black: '#141210',
+  blanc: '#f7f5f2',
+  white: '#f7f5f2',
+  gris: '#9a958f',
+  grey: '#9a958f',
+  gray: '#9a958f',
+  rouge: '#c2321f',
+  red: '#c2321f',
+  bleu: '#2b4fa8',
+  blue: '#2b4fa8',
+  navy: '#1f2a44',
+  vert: '#3d6b45',
+  green: '#3d6b45',
+  beige: '#d9cbb3',
+  sable: '#d9cbb3',
+  sand: '#d9cbb3',
+  marron: '#6b4a32',
+  brown: '#6b4a32',
+  rose: '#e7a7b4',
+  pink: '#e7a7b4',
+  jaune: '#e8c547',
+  yellow: '#e8c547',
+  orange: '#e2742a',
+  violet: '#6a4c93',
+  purple: '#6a4c93',
+  crème: '#efe7d6',
+  cream: '#efe7d6',
+  argent: '#c9c9cc',
+  silver: '#c9c9cc',
+  or: '#d4af37',
+  gold: '#d4af37',
+  kaki: '#7a7a4f',
+  olive: '#7a7a4f',
+};
+export function colorFromName(name: string) {
+  const key = name.toLowerCase().split(/[\s/,-]+/)[0];
+  return COLOR_WORDS[key] ?? 'linear-gradient(135deg,#e2ded8,#9a958f)';
+}
+
 export function ProductItem({
   product,
   loading,
@@ -80,7 +148,9 @@ export function ProductItem({
   const hoverImage = product.images?.nodes?.[1];
   const badge = getBadge(product);
   const colorOpt = product.options?.find((o) => isColorOption(o.name));
-  const colors = colorOpt?.optionValues.length ?? 0;
+  const colorValues = colorOpt?.optionValues ?? [];
+  const colors = colorValues.length;
+  const subtitle = productSubtitle(product);
   const firstVariant = product.variants?.nodes?.[0];
   const compareAt =
     firstVariant?.compareAtPrice ??
@@ -126,6 +196,16 @@ export function ProductItem({
             <span className={`badge badge--${badge.tone}`}>{badge.label}</span>
           ) : null}
         </Link>
+        <WishlistButton
+          className="card-wish"
+          item={{
+            handle: product.handle,
+            title: product.title,
+            vendor: product.vendor,
+            image: image?.url,
+            price: product.priceRange.minVariantPrice,
+          }}
+        />
         <QuickAdd product={product} />
       </div>
       <Link className="card-body" prefetch="intent" to={variantUrl}>
@@ -133,7 +213,21 @@ export function ProductItem({
           <p className="card-vendor">{product.vendor}</p>
         ) : null}
         <h3 className="card-title">{product.title}</h3>
-        {colors > 1 ? <p className="card-meta">{colors} coloris</p> : null}
+        <p className="card-meta">
+          {subtitle}
+          {colors > 1 ? ` · ${colors} coloris` : ''}
+        </p>
+        {colors > 1 ? (
+          <span className="card-dots" aria-hidden>
+            {colorValues.slice(0, 6).map((v) => (
+              <i
+                key={v.name}
+                style={{background: v.swatch?.color || colorFromName(v.name)}}
+              />
+            ))}
+            {colors > 6 ? <em>+{colors - 6}</em> : null}
+          </span>
+        ) : null}
         <Price
           price={price}
           compareAtPrice={hasRange ? undefined : compareAt}
@@ -220,6 +314,7 @@ export const PRODUCT_CARD_FRAGMENT = `#graphql
     handle
     title
     vendor
+    productType
     tags
     publishedAt
     featuredImage {
@@ -247,6 +342,9 @@ export const PRODUCT_CARD_FRAGMENT = `#graphql
       name
       optionValues {
         name
+        swatch {
+          color
+        }
       }
     }
     variants(first: 40) {

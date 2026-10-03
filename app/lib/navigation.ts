@@ -1,4 +1,5 @@
 import {BRANDS} from './config';
+import {GUIDES, ICON_MODELS} from './content';
 
 /**
  * Mega-menu structure. Every `to` is a normal storefront URL,
@@ -6,12 +7,22 @@ import {BRANDS} from './config';
  */
 export type NavLink = {label: string; to: string; badge?: string};
 export type NavColumn = {title: string; links: NavLink[]};
+export type NavFeature = {
+  title: string;
+  copy: string;
+  to: string;
+  /** Collection handle whose image is used as the card background. */
+  handle?: string;
+  image?: string;
+};
 export type NavItem = {
   label: string;
   to: string;
   accent?: boolean;
   columns?: NavColumn[];
-  feature?: {title: string; copy: string; to: string; handle?: string};
+  feature?: NavFeature;
+  /** Optional second feature card. */
+  feature2?: NavFeature;
 };
 
 export const NAVIGATION: NavItem[] = [
@@ -46,6 +57,13 @@ export const NAVIGATION: NavItem[] = [
       title: 'Le drop de la semaine',
       copy: 'Les paires qui viennent d’arriver en boutique.',
       to: '/collections/all?sort=newest',
+      handle: 'all',
+    },
+    feature2: {
+      title: 'Éditions limitées',
+      copy: 'Rares, numérotées, vite parties.',
+      to: '/collections/limited',
+      handle: 'limited',
     },
   },
   {
@@ -76,6 +94,12 @@ export const NAVIGATION: NavItem[] = [
       to: '/collections/homme',
       handle: 'homme',
     },
+    feature2: {
+      title: 'Running homme',
+      copy: 'Amorti, rebond, vitesse.',
+      to: '/collections/homme-running',
+      handle: 'running',
+    },
   },
   {
     label: 'Femme',
@@ -104,6 +128,12 @@ export const NAVIGATION: NavItem[] = [
       to: '/collections/femme',
       handle: 'femme',
     },
+    feature2: {
+      title: 'Plateformes',
+      copy: 'Quelques centimètres, zéro compromis.',
+      to: '/collections/femme-plateformes',
+      handle: 'femme-plateformes',
+    },
   },
   {
     label: 'Enfant',
@@ -117,7 +147,50 @@ export const NAVIGATION: NavItem[] = [
           {label: 'Junior (36 – 40)', to: '/collections/junior'},
         ],
       },
+      {
+        title: 'Par usage',
+        links: [
+          {label: 'École & quotidien', to: '/collections/enfant'},
+          {label: 'Sport', to: '/collections/enfant'},
+        ],
+      },
     ],
+    feature: {
+      title: 'Enfant',
+      copy: 'Les mêmes icônes, en petites pointures.',
+      to: '/collections/enfant',
+      handle: 'enfant',
+    },
+  },
+  {
+    label: 'Icônes',
+    to: '/collections/all?sort=best-selling',
+    columns: [
+      {
+        title: 'Les modèles cultes',
+        links: ICON_MODELS.slice(0, 6).map((m) => ({
+          label: m.name,
+          to: `/search?q=${encodeURIComponent(m.query)}`,
+        })),
+      },
+      {
+        title: 'Running',
+        links: ICON_MODELS.slice(6).map((m) => ({
+          label: m.name,
+          to: `/search?q=${encodeURIComponent(m.query)}`,
+        })),
+      },
+      {
+        title: 'Guides',
+        links: GUIDES,
+      },
+    ],
+    feature: {
+      title: 'Les icônes',
+      copy: 'Les silhouettes qui ont écrit l’histoire de la sneaker.',
+      to: '/collections/all?sort=best-selling',
+      handle: 'lifestyle',
+    },
   },
   {
     label: 'Marques',
@@ -152,7 +225,9 @@ export const FOOTER_COLUMNS: NavColumn[] = [
       {label: 'Livraison', to: '/policies/shipping-policy'},
       {label: 'Retours & échanges', to: '/policies/refund-policy'},
       {label: 'Guide des tailles', to: '/pages/guide-des-tailles'},
+      {label: 'FAQ', to: '/pages/faq'},
       {label: 'Suivre ma commande', to: '/account/orders'},
+      {label: 'Ma wishlist', to: '/wishlist'},
       {label: 'Contact', to: '/pages/contact'},
     ],
   },
@@ -161,8 +236,43 @@ export const FOOTER_COLUMNS: NavColumn[] = [
     links: [
       {label: 'Notre histoire', to: '/pages/a-propos'},
       {label: 'Authenticité', to: '/pages/authenticite'},
+      {label: 'Journal', to: '/blogs/journal'},
       {label: 'Conditions générales', to: '/policies/terms-of-service'},
       {label: 'Confidentialité', to: '/policies/privacy-policy'},
     ],
   },
 ];
+
+/** Chips shown under a collection title: children of the matching nav item, or gender variants. */
+export function subChips(handle: string): NavLink[] {
+  const item = NAVIGATION.find((n) => n.to === `/collections/${handle}`);
+  if (item?.columns?.length) {
+    return item.columns[0].links.filter((l) => l.to !== item.to).slice(0, 8);
+  }
+  const categories = ['running', 'lifestyle', 'basketball', 'outdoor'];
+  if (categories.includes(handle)) {
+    return [
+      {label: 'Homme', to: `/collections/homme-${handle}`},
+      {label: 'Femme', to: `/collections/femme-${handle}`},
+      {label: 'Promos', to: '/collections/promo'},
+    ];
+  }
+  const m = /^(homme|femme)-(.+)$/.exec(handle);
+  if (m) {
+    return categories
+      .filter((c) => c !== m[2])
+      .map((c) => ({
+        label: c[0].toUpperCase() + c.slice(1),
+        to: `/collections/${m[1]}-${c}`,
+      }));
+  }
+  if (BRANDS.some((b) => b.handle === handle)) {
+    return [
+      {label: 'Homme', to: '/collections/homme'},
+      {label: 'Femme', to: '/collections/femme'},
+      {label: 'Nouveautés', to: '/collections/all?sort=newest'},
+      {label: 'Promos', to: '/collections/promo'},
+    ];
+  }
+  return [];
+}

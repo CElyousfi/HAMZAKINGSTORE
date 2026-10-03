@@ -12,13 +12,20 @@ import {
 } from 'react-router';
 import type {Route} from './+types/root';
 import favicon from '~/assets/favicon.svg';
-import {FOOTER_QUERY, HEADER_QUERY} from '~/lib/fragments';
+import {
+  FOOTER_QUERY,
+  HEADER_QUERY,
+  MENU_COLLECTIONS_QUERY,
+} from '~/lib/fragments';
+import {CookieConsent} from './components/CookieConsent';
+import {ToastProvider} from './lib/ui';
+import {BRAND} from './lib/config';
+import {SITE} from './lib/content';
 import resetStyles from '~/styles/reset.css?url';
 import appStyles from '~/styles/app.css?url';
 import {PageLayout} from './components/PageLayout';
 import {MetaPixel} from './components/MetaPixel';
-import archivoFont from '@fontsource-variable/archivo/wdth.css?url';
-import interFont from '@fontsource-variable/inter/index.css?url';
+import fontStyles from '~/styles/fonts.css?url';
 
 export type RootLoader = typeof loader;
 
@@ -67,6 +74,15 @@ export function links() {
     {rel: 'icon', type: 'image/svg+xml', href: favicon},
   ];
 }
+
+export const meta: Route.MetaFunction = () => [
+  {title: `${BRAND.name} | Sneakers authentiques au Maroc`},
+  {name: 'description', content: BRAND.tagline},
+  {property: 'og:site_name', content: BRAND.name},
+  {property: 'og:type', content: 'website'},
+  {property: 'og:locale', content: SITE.locale},
+  {name: 'twitter:card', content: 'summary_large_image'},
+];
 
 export async function loader(args: Route.LoaderArgs) {
   // Start fetching non-critical data without blocking time to first byte
@@ -138,10 +154,33 @@ function loadDeferredData({context}: Route.LoaderArgs) {
       console.error(error);
       return null;
     });
+  const menuImages = storefront
+    .query(MENU_COLLECTIONS_QUERY, {cache: storefront.CacheLong()})
+    .then((r) => {
+      const map: Record<
+        string,
+        {
+          url: string;
+          altText?: string | null;
+          width?: number | null;
+          height?: number | null;
+        }
+      > = {};
+      for (const c of r.collections.nodes) {
+        const img = c.image ?? c.products.nodes[0]?.featuredImage;
+        if (img) map[c.handle] = img;
+      }
+      return map;
+    })
+    .catch((error: Error) => {
+      console.error(error);
+      return {} as Record<string, {url: string}>;
+    });
   return {
     cart: cart.get(),
     isLoggedIn: customerAccount.isLoggedIn(),
     footer,
+    menuImages,
   };
 }
 
@@ -149,17 +188,37 @@ export function Layout({children}: {children?: React.ReactNode}) {
   const nonce = useNonce();
 
   return (
-    <html lang="fr">
+    <html lang="fr" suppressHydrationWarning>
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width,initial-scale=1" />
         <meta name="theme-color" content="#12100e" />
-        <link rel="stylesheet" href={archivoFont}></link>
-        <link rel="stylesheet" href={interFont}></link>
+        <link
+          rel="preload"
+          href="/fonts/archivo-latin-wdth-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="/fonts/inter-latin-wght-normal.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link rel="stylesheet" href={fontStyles}></link>
         <link rel="stylesheet" href={resetStyles}></link>
         <link rel="stylesheet" href={appStyles}></link>
         <Meta />
         <Links />
+        <script
+          nonce={nonce}
+          suppressHydrationWarning
+          dangerouslySetInnerHTML={{
+            __html: "document.documentElement.classList.add('js')",
+          }}
+        />
       </head>
       <body>
         {children}
@@ -183,10 +242,13 @@ export default function App() {
       shop={data.shop}
       consent={data.consent}
     >
-      <PageLayout {...data}>
-        <Outlet />
-      </PageLayout>
-      <MetaPixel pixelId={data.metaPixelId} />
+      <ToastProvider>
+        <PageLayout {...data}>
+          <Outlet />
+        </PageLayout>
+        <CookieConsent />
+        <MetaPixel pixelId={data.metaPixelId} />
+      </ToastProvider>
     </Analytics.Provider>
   );
 }

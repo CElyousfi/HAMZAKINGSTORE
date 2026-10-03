@@ -3,6 +3,10 @@ import type {Route} from './+types/search';
 import {getPaginationVariables, Analytics} from '@shopify/hydrogen';
 import {SearchForm} from '~/components/SearchForm';
 import {SearchResults} from '~/components/SearchResults';
+import {PRODUCT_CARD_FRAGMENT} from '~/components/ProductItem';
+import {ICON_MODELS} from '~/lib/content';
+import {Link} from 'react-router';
+import {IconSearch} from '~/components/Icons';
 import {
   type RegularSearchReturn,
   type PredictiveSearchReturn,
@@ -39,28 +43,58 @@ export async function loader({request, context}: Route.LoaderArgs) {
 export default function SearchPage() {
   const {type, term, result, error} = useLoaderData<typeof loader>();
   if (type === 'predictive') return null;
+  const total = result?.total ?? 0;
 
   return (
     <div className="search">
-      <h1>Search</h1>
-      <SearchForm>
-        {({inputRef}) => (
-          <>
-            <input
-              defaultValue={term}
-              name="q"
-              placeholder="Search…"
-              ref={inputRef}
-              type="search"
-            />
-            &nbsp;
-            <button type="submit">Search</button>
-          </>
-        )}
-      </SearchForm>
-      {error && <p style={{color: 'red'}}>{error}</p>}
-      {!term || !result?.total ? (
-        <SearchResults.Empty />
+      <header className="search-head">
+        <p className="eyebrow">Recherche</p>
+        <h1 className="display-l">
+          {term ? <>« {term} »</> : 'Que cherches-tu ?'}
+        </h1>
+        {term ? (
+          <p className="muted">
+            {total} résultat{total > 1 ? 's' : ''}
+          </p>
+        ) : null}
+        <SearchForm className="search-page-form">
+          {({inputRef}) => (
+            <div className="search-field">
+              <IconSearch />
+              <input
+                defaultValue={term}
+                name="q"
+                placeholder="Un modèle, une marque, une couleur…"
+                ref={inputRef}
+                type="search"
+                autoComplete="off"
+              />
+              <button type="submit" className="btn btn--sm">
+                Chercher
+              </button>
+            </div>
+          )}
+        </SearchForm>
+      </header>
+      {error && <p className="form-error">{error}</p>}
+      {!term || !total ? (
+        <div className="search-empty">
+          {term ? (
+            <p className="display-s">Aucun résultat pour « {term} ».</p>
+          ) : null}
+          <p className="muted">Essaie l’un de ces modèles :</p>
+          <div className="chip-row">
+            {ICON_MODELS.map((m) => (
+              <Link
+                key={m.name}
+                to={`/search?q=${encodeURIComponent(m.query)}`}
+                className="chip"
+              >
+                {m.name}
+              </Link>
+            ))}
+          </div>
+        </div>
       ) : (
         <SearchResults result={result} term={term}>
           {({articles, pages, products, term}) => (
@@ -84,42 +118,10 @@ export default function SearchPage() {
 const SEARCH_PRODUCT_FRAGMENT = `#graphql
   fragment SearchProduct on Product {
     __typename
-    handle
-    id
-    publishedAt
-    title
     trackingParameters
-    vendor
-    selectedOrFirstAvailableVariant(
-      selectedOptions: []
-      ignoreUnknownOptions: true
-      caseInsensitiveMatch: true
-    ) {
-      id
-      image {
-        url
-        altText
-        width
-        height
-      }
-      price {
-        amount
-        currencyCode
-      }
-      compareAtPrice {
-        amount
-        currencyCode
-      }
-      selectedOptions {
-        name
-        value
-      }
-      product {
-        handle
-        title
-      }
-    }
+    ...ProductCard
   }
+  ${PRODUCT_CARD_FRAGMENT}
 ` as const;
 
 const SEARCH_PAGE_FRAGMENT = `#graphql

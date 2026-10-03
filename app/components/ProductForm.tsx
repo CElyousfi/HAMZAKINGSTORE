@@ -18,10 +18,14 @@ export function ProductForm({
   productOptions,
   selectedVariant,
   productTitle,
+  fitNote,
+  stockMessage,
 }: {
   productOptions: MappedProductOptions[];
   selectedVariant: ProductFragment['selectedOrFirstAvailableVariant'];
   productTitle: string;
+  fitNote?: string;
+  stockMessage?: string;
 }) {
   const navigate = useNavigate();
   const {open} = useAside();
@@ -108,7 +112,15 @@ export function ProductForm({
                       to={`/products/${handle}?${variantUriQuery}`}
                       title={name}
                     >
-                      <OptionSwatch swatch={swatch} name={name} />
+                      <OptionSwatch
+                        swatch={swatch}
+                        name={name}
+                        image={
+                          isColor
+                            ? value.firstSelectableVariant?.image?.url
+                            : undefined
+                        }
+                      />
                     </Link>
                   );
                 }
@@ -133,11 +145,20 @@ export function ProductForm({
                       }
                     }}
                   >
-                    <OptionSwatch swatch={swatch} name={name} />
+                    <OptionSwatch
+                      swatch={swatch}
+                      name={name}
+                      image={
+                        isColor
+                          ? value.firstSelectableVariant?.image?.url
+                          : undefined
+                      }
+                    />
                   </button>
                 );
               })}
             </div>
+            {isSize && fitNote ? <p className="opt-fit">{fitNote}</p> : null}
             {isSize && nudge ? (
               <p className="opt-nudge">Choisis ta pointure pour continuer.</p>
             ) : null}
@@ -145,6 +166,13 @@ export function ProductForm({
         );
       })}
 
+      {stockMessage ? (
+        <p
+          className={`stock-msg ${selectedVariant?.availableForSale ? 'is-low' : 'is-out'}`}
+        >
+          {stockMessage}
+        </p>
+      ) : null}
       <div className="pdp-buy">
         {needsSize ? (
           <button
@@ -199,11 +227,13 @@ export function ProductForm({
 function OptionSwatch({
   swatch,
   name,
+  image: variantImage,
 }: {
   swatch?: Maybe<ProductOptionValueSwatch> | undefined;
   name: string;
+  image?: string;
 }) {
-  const image = swatch?.image?.previewImage?.url;
+  const image = swatch?.image?.previewImage?.url || variantImage;
   const color = swatch?.color;
   if (!image && !color) return <span className="opt-text">{name}</span>;
   return (
