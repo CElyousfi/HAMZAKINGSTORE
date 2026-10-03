@@ -43,6 +43,7 @@ export const NAVIGATION: NavItem[] = [
           {label: 'Best-sellers', to: '/collections/all?sort=best-selling'},
           {label: 'Retour en stock', to: '/collections/restock'},
           {label: 'Éditions limitées', to: '/collections/limited'},
+          {label: 'Luxe & designer', to: '/collections/luxe'},
         ],
       },
       {

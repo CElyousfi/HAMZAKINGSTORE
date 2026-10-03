@@ -127,6 +127,41 @@ export const BRANDS: Brand[] = [
     tagline: 'Skate et culture de la rue.',
     focus: ['lifestyle'],
   },
+  {
+    name: 'Reebok',
+    handle: 'reebok',
+    logo: '/brands/reebok.png',
+    tagline: 'Classiques du fitness et icônes rétro.',
+    focus: ['lifestyle', 'running'],
+  },
+  {
+    name: 'Lacoste',
+    handle: 'lacoste',
+    logo: '/brands/lacoste.png',
+    tagline: 'L’élégance du court, en version sneaker.',
+    focus: ['lifestyle'],
+  },
+  {
+    name: 'The North Face',
+    handle: 'the-north-face',
+    logo: '/brands/the-north-face.png',
+    tagline: 'Trail, randonnée et grand air.',
+    focus: ['outdoor', 'running'],
+  },
+  {
+    name: 'Dior',
+    handle: 'dior',
+    logo: '/brands/dior.png',
+    tagline: 'Sneakers de luxe, signées couture.',
+    focus: ['lifestyle'],
+  },
+  {
+    name: 'Louis Vuitton',
+    handle: 'louis-vuitton',
+    logo: '/brands/louis-vuitton.png',
+    tagline: 'Le luxe parisien, du trainer au runner.',
+    focus: ['lifestyle'],
+  },
 ];
 
 /**

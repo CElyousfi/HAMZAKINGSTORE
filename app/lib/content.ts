@@ -137,6 +137,10 @@ export const POPULAR_CATEGORIES = [
   {label: 'New Balance Maroc', to: '/collections/new-balance'},
   {label: 'Jordan Maroc', to: '/collections/jordan'},
   {label: 'Asics Maroc', to: '/collections/asics'},
+  {label: 'Lacoste Maroc', to: '/collections/lacoste'},
+  {label: 'The North Face Maroc', to: '/collections/the-north-face'},
+  {label: 'Sneakers de luxe Dior & Louis Vuitton', to: '/collections/luxe'},
+  {label: 'Reebok Maroc', to: '/collections/reebok'},
   {label: 'Promos sneakers', to: '/collections/promo'},
   {label: 'Éditions limitées', to: '/collections/limited'},
 ];
@@ -398,7 +402,7 @@ export const PHOTOS = {
   storyRunning: photo('story-running', 1536, 1024),
   storyLifestyle: photo('story-lifestyle', 1536, 1024),
   band: photo('band-authenticite', 1600, 685),
-  colAll: photo('col-nouveautes', 1010, 1024),
+  colAll: photo('col-nouveautes', 1536, 1024),
   colLimited: photo('col-limited', 1536, 1024),
   colHomme: photo('col-homme', 1536, 1024),
   colFemme: photo('col-femme', 1536, 1024),
@@ -443,6 +447,11 @@ export const COLLECTION_IMAGES: Record<string, Photo> = {
   'adidas-originals': PHOTOS.storyLifestyle,
   asics: PHOTOS.storyLifestyle,
   'new-balance': PHOTOS.band,
+  lacoste: PHOTOS.colFemme,
+  'the-north-face': PHOTOS.colOutdoor,
+  'louis-vuitton': PHOTOS.colLimited,
+  dior: PHOTOS.colAll,
+  luxe: PHOTOS.colLimited,
 };
 
 /** Resolve a /public path to its known dimensions (for width/height attrs). */
