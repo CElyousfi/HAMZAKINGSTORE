@@ -181,10 +181,24 @@ function BrandTicker() {
     <div className="ticker" aria-hidden>
       <div className="ticker-track">
         {row.map((b, i) => (
-          <span key={`${b.handle}-${i}`} className="ticker-item">
-            {b.name}
+          <Link
+            key={`${b.handle}-${i}`}
+            to={`/collections/${b.handle}`}
+            className="ticker-item"
+            tabIndex={-1}
+          >
+            {b.logo ? (
+              <img
+                className="ticker-logo"
+                src={b.logo}
+                alt={b.name}
+                loading="lazy"
+              />
+            ) : (
+              b.name
+            )}
             <span className="ticker-sep">✦</span>
-          </span>
+          </Link>
         ))}
       </div>
     </div>
@@ -312,7 +326,17 @@ function BrandIndex() {
           <li key={b.handle}>
             <Link to={`/collections/${b.handle}`}>
               <span className="brand-n">{String(i + 1).padStart(2, '0')}</span>
-              <span className="brand-name">{b.name}</span>
+              <span className="brand-name">
+                {b.logo ? (
+                  <img
+                    className="brand-logo"
+                    src={b.logo}
+                    alt=""
+                    loading="lazy"
+                  />
+                ) : null}
+                {b.name}
+              </span>
               <IconArrow className="brand-arrow" />
             </Link>
           </li>

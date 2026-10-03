@@ -33,20 +33,25 @@ export const ANNOUNCEMENTS = [
 ];
 
 /**
- * Brands shown in the "Marques" mega-menu and on the homepage.
- * `handle` must match a Shopify collection handle (create one collection per brand).
+ * Brands shown in the "Marques" mega-menu, the scrolling strip and the brand index.
+ * `handle` must match a Shopify collection handle.
+ * `logo` (optional): path to the brand's OFFICIAL logo file in /public/brands/
+ * (SVG or transparent PNG from the brand's press kit or your authorised supplier).
+ * When a logo is missing, the brand name is shown in the site's typography.
  */
-export const BRANDS = [
-  {name: 'Nike', handle: 'nike'},
-  {name: 'Jordan', handle: 'jordan'},
-  {name: 'Adidas', handle: 'adidas'},
-  {name: 'New Balance', handle: 'new-balance'},
-  {name: 'Asics', handle: 'asics'},
-  {name: 'Puma', handle: 'puma'},
-  {name: 'On', handle: 'on'},
-  {name: 'Hoka', handle: 'hoka'},
-  {name: 'Converse', handle: 'converse'},
-  {name: 'Vans', handle: 'vans'},
+export type Brand = {name: string; handle: string; logo?: string};
+
+export const BRANDS: Brand[] = [
+  {name: 'Nike', handle: 'nike', logo: ''},
+  {name: 'Jordan', handle: 'jordan', logo: ''},
+  {name: 'Adidas', handle: 'adidas', logo: ''},
+  {name: 'New Balance', handle: 'new-balance', logo: ''},
+  {name: 'Asics', handle: 'asics', logo: ''},
+  {name: 'Puma', handle: 'puma', logo: ''},
+  {name: 'On', handle: 'on', logo: ''},
+  {name: 'Hoka', handle: 'hoka', logo: ''},
+  {name: 'Converse', handle: 'converse', logo: ''},
+  {name: 'Vans', handle: 'vans', logo: ''},
 ];
 
 /** Homepage "univers" tiles. `handle` = Shopify collection handle. */

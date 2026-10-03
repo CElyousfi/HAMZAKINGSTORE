@@ -3107,3 +3107,32 @@ ul.mega-col,
     bottom: 14px;
   }
 }
+
+/* Brand logos (optional, see app/lib/config.ts) */
+.ticker-logo {
+  height: 26px;
+  width: auto;
+  max-width: 140px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0);
+  opacity: 0.85;
+  transition: opacity 0.2s;
+}
+.ticker-item:hover .ticker-logo {
+  opacity: 1;
+}
+.brand-name {
+  display: inline-flex;
+  align-items: center;
+  gap: 16px;
+}
+.brand-logo {
+  height: 28px;
+  width: auto;
+  max-width: 80px;
+  object-fit: contain;
+  filter: grayscale(1) brightness(0);
+}
+.brand-list a:hover .brand-logo {
+  filter: grayscale(1) brightness(0) invert(1);
+}
