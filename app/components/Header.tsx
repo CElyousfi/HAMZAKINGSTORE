@@ -368,7 +368,6 @@ function MegaPanel({
                   }}
                 </Await>
               </Suspense>
-              <span className="mega-feature-index">{item.label}</span>
               <span className="mega-feature-title">{f.title}</span>
               <span className="mega-feature-copy">{f.copy}</span>
               <span className="mega-feature-cta">
