@@ -39,7 +39,7 @@ export const CAMPAIGN: Campaign = {
     label: 'Découvrir les nouveautés',
     to: '/collections/all?sort=newest',
   },
-  secondary: {label: 'Voir les marques', to: '/collections'},
+  secondary: {label: 'Voir les marques', to: '/marques'},
   image: '',
   video: '',
   theme: 'dark',

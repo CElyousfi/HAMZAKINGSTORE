@@ -39,24 +39,94 @@ export const ANNOUNCEMENTS = [
  * (SVG or transparent PNG from the brand's press kit or your authorised supplier).
  * When a logo is missing, the brand name is shown in the site's typography.
  */
-export type Brand = {name: string; handle: string; logo?: string};
+export type Brand = {
+  name: string;
+  handle: string;
+  logo?: string;
+  /** Short line shown in the brand menu and on /marques. */
+  tagline?: string;
+  /** Which shopper journeys this brand is strongest in (used as quick links). */
+  focus?: ('running' | 'lifestyle' | 'basketball' | 'outdoor')[];
+};
 
 export const BRANDS: Brand[] = [
-  {name: 'Nike', handle: 'nike', logo: '/brands/nike.png'},
-  {name: 'Jordan', handle: 'jordan', logo: '/brands/jordan.png'},
-  {name: 'Adidas', handle: 'adidas', logo: '/brands/adidas.png'},
+  {
+    name: 'Nike',
+    handle: 'nike',
+    logo: '/brands/nike.png',
+    tagline: 'Running, basket et icônes de la rue.',
+    focus: ['running', 'lifestyle', 'basketball'],
+  },
+  {
+    name: 'Jordan',
+    handle: 'jordan',
+    logo: '/brands/jordan.png',
+    tagline: 'L’héritage du basket, du parquet au bitume.',
+    focus: ['basketball', 'lifestyle'],
+  },
+  {
+    name: 'Adidas',
+    handle: 'adidas',
+    logo: '/brands/adidas.png',
+    tagline: 'Performance et terrains de sport.',
+    focus: ['running', 'lifestyle'],
+  },
   {
     name: 'Adidas Originals',
     handle: 'adidas-originals',
     logo: '/brands/adidas-originals.png',
+    tagline: 'Les classiques rétro, portés au quotidien.',
+    focus: ['lifestyle'],
   },
-  {name: 'New Balance', handle: 'new-balance', logo: '/brands/new-balance.png'},
-  {name: 'Asics', handle: 'asics', logo: '/brands/asics.png'},
-  {name: 'Puma', handle: 'puma', logo: '/brands/puma.png'},
-  {name: 'On', handle: 'on', logo: '/brands/on.png'},
-  {name: 'Hoka', handle: 'hoka', logo: '/brands/hoka.png'},
-  {name: 'Converse', handle: 'converse', logo: '/brands/converse.png'},
-  {name: 'Vans', handle: 'vans', logo: '/brands/vans.png'},
+  {
+    name: 'New Balance',
+    handle: 'new-balance',
+    logo: '/brands/new-balance.png',
+    tagline: 'Confort et silhouettes rétro-running.',
+    focus: ['lifestyle', 'running'],
+  },
+  {
+    name: 'Asics',
+    handle: 'asics',
+    logo: '/brands/asics.png',
+    tagline: 'Running technique et rééditions des années 2000.',
+    focus: ['running', 'lifestyle'],
+  },
+  {
+    name: 'Puma',
+    handle: 'puma',
+    logo: '/brands/puma.png',
+    tagline: 'Sport, lifestyle et collaborations.',
+    focus: ['lifestyle', 'running'],
+  },
+  {
+    name: 'On',
+    handle: 'on',
+    logo: '/brands/on.png',
+    tagline: 'Running suisse, léger et amorti.',
+    focus: ['running'],
+  },
+  {
+    name: 'Hoka',
+    handle: 'hoka',
+    logo: '/brands/hoka.png',
+    tagline: 'Amorti maximal pour la route et le trail.',
+    focus: ['running', 'outdoor'],
+  },
+  {
+    name: 'Converse',
+    handle: 'converse',
+    logo: '/brands/converse.png',
+    tagline: 'La toile intemporelle.',
+    focus: ['lifestyle'],
+  },
+  {
+    name: 'Vans',
+    handle: 'vans',
+    logo: '/brands/vans.png',
+    tagline: 'Skate et culture de la rue.',
+    focus: ['lifestyle'],
+  },
 ];
 
 /**

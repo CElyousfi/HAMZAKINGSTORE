@@ -19,6 +19,8 @@ export type NavItem = {
   label: string;
   to: string;
   accent?: boolean;
+  /** 'brands' renders the logo-driven brand panel instead of link columns. */
+  kind?: 'brands';
   columns?: NavColumn[];
   feature?: NavFeature;
   /** Optional second feature card. */
@@ -194,7 +196,8 @@ export const NAVIGATION: NavItem[] = [
   },
   {
     label: 'Marques',
-    to: '/collections',
+    to: '/marques',
+    kind: 'brands',
     columns: [
       {
         title: 'Toutes les marques',
@@ -216,6 +219,7 @@ export const FOOTER_COLUMNS: NavColumn[] = [
       {label: 'Homme', to: '/collections/homme'},
       {label: 'Femme', to: '/collections/femme'},
       {label: 'Enfant', to: '/collections/enfant'},
+      {label: 'Toutes les marques', to: '/marques'},
       {label: 'Promos', to: '/collections/promo'},
     ],
   },
@@ -275,4 +279,27 @@ export function subChips(handle: string): NavLink[] {
     ];
   }
   return [];
+}
+
+const FOCUS_LABELS = {
+  running: 'Running',
+  lifestyle: 'Lifestyle',
+  basketball: 'Basketball',
+  outdoor: 'Outdoor',
+} as const;
+
+/** Quick links shown for a brand in the menu and on /marques. */
+export function brandLinks(handle: string): NavLink[] {
+  const brand = BRANDS.find((b) => b.handle === handle);
+  const base = `/collections/${handle}`;
+  return [
+    {label: 'Toute la collection', to: base},
+    {label: 'Nouveautés', to: `${base}?sort=newest`},
+    {label: 'Meilleures ventes', to: `${base}?sort=best-selling`},
+    {label: 'Prix croissant', to: `${base}?sort=price-asc`},
+    ...(brand?.focus ?? []).map((f) => ({
+      label: FOCUS_LABELS[f],
+      to: `/collections/${f}`,
+    })),
+  ];
 }

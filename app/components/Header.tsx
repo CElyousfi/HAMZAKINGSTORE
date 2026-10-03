@@ -3,8 +3,13 @@ import {Await, Link, NavLink, useAsyncValue, useLocation} from 'react-router';
 import {Image, useOptimisticCart, useAnalytics} from '@shopify/hydrogen';
 import type {CartApiQueryFragment, HeaderQuery} from 'storefrontapi.generated';
 import {useAside} from '~/components/Aside';
-import {ANNOUNCEMENTS, BRAND, whatsappLink} from '~/lib/config';
-import {NAVIGATION, type NavFeature, type NavItem} from '~/lib/navigation';
+import {ANNOUNCEMENTS, BRAND, BRANDS, whatsappLink} from '~/lib/config';
+import {
+  NAVIGATION,
+  brandLinks,
+  type NavFeature,
+  type NavItem,
+} from '~/lib/navigation';
 import {useWishlist} from '~/lib/ui';
 import {
   IconBag,
@@ -125,7 +130,15 @@ export function Header({cart, menuImages}: HeaderProps) {
         </div>
 
         {NAVIGATION.map((item, i) =>
-          item.columns ? (
+          item.kind === 'brands' ? (
+            <BrandMegaPanel
+              key={item.label}
+              open={openIndex === i}
+              onClose={() => setOpenIndex(null)}
+              onEnter={() => openPanel(i)}
+              menuImages={menuImages}
+            />
+          ) : item.columns ? (
             <MegaPanel
               key={item.label}
               item={item}
@@ -142,6 +155,124 @@ export function Header({cart, menuImages}: HeaderProps) {
         onMouseEnter={() => setOpenIndex(null)}
         aria-hidden
       />
+    </div>
+  );
+}
+
+function BrandMegaPanel({
+  open,
+  onClose,
+  onEnter,
+  menuImages,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onEnter: () => void;
+  menuImages: Promise<MenuImages>;
+}) {
+  const [active, setActive] = useState(BRANDS[0]?.handle ?? '');
+  const brand = BRANDS.find((b) => b.handle === active) ?? BRANDS[0];
+  const links = brandLinks(brand.handle);
+  return (
+    <div
+      className={`mega mega--brands ${open ? 'is-open' : ''}`}
+      aria-hidden={!open}
+      onMouseEnter={onEnter}
+    >
+      <div className="bmega">
+        <div className="bmega-grid-wrap">
+          <div className="bmega-head">
+            <p className="mega-title">Nos marques</p>
+            <Link
+              to="/marques"
+              className="link-arrow"
+              onClick={onClose}
+              tabIndex={open ? 0 : -1}
+            >
+              Toutes les marques <IconArrow width={16} height={16} />
+            </Link>
+          </div>
+          <ul className="bmega-grid" role="list">
+            {BRANDS.map((b) => (
+              <li key={b.handle}>
+                <Link
+                  to={`/collections/${b.handle}`}
+                  className={`bmega-tile ${b.handle === brand.handle ? 'is-active' : ''}`}
+                  onMouseEnter={() => setActive(b.handle)}
+                  onFocus={() => setActive(b.handle)}
+                  onClick={onClose}
+                  tabIndex={open ? 0 : -1}
+                  aria-label={b.name}
+                >
+                  {b.logo ? (
+                    <img
+                      src={b.logo}
+                      alt=""
+                      loading="lazy"
+                      className="bmega-logo"
+                    />
+                  ) : (
+                    <span className="bmega-word">{b.name}</span>
+                  )}
+                  <span className="bmega-name">{b.name}</span>
+                </Link>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        <div className="bmega-preview" aria-live="polite">
+          <Link
+            to={`/collections/${brand.handle}`}
+            className="bmega-visual"
+            onClick={onClose}
+            tabIndex={open ? 0 : -1}
+          >
+            <Suspense fallback={null}>
+              <Await resolve={menuImages}>
+                {(imgs) =>
+                  imgs[brand.handle] ? (
+                    <Image
+                      key={brand.handle}
+                      data={imgs[brand.handle]}
+                      alt=""
+                      className="bmega-visual-img"
+                      sizes="380px"
+                      loading="lazy"
+                    />
+                  ) : (
+                    <span className="bmega-visual-empty">
+                      {brand.logo ? (
+                        <img src={brand.logo} alt="" />
+                      ) : (
+                        brand.name
+                      )}
+                    </span>
+                  )
+                }
+              </Await>
+            </Suspense>
+            <span className="bmega-visual-cta">
+              Voir {brand.name} <IconArrow width={16} height={16} />
+            </span>
+          </Link>
+          <div className="bmega-info">
+            <p className="bmega-info-name">{brand.name}</p>
+            {brand.tagline ? (
+              <p className="bmega-info-tag">{brand.tagline}</p>
+            ) : null}
+            <ul className="bmega-links">
+              {links.map((l) => (
+                <li key={l.label}>
+                  <Link to={l.to} onClick={onClose} tabIndex={open ? 0 : -1}>
+                    {l.label}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

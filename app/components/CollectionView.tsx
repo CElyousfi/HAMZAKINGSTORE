@@ -8,6 +8,7 @@ import {
 } from 'react-router';
 import {Image} from '@shopify/hydrogen';
 import {subChips} from '~/lib/navigation';
+import {BRANDS} from '~/lib/config';
 import {PaginatedResourceSection} from './PaginatedResourceSection';
 import {ProductItem, type CardProduct} from './ProductItem';
 import {
@@ -97,6 +98,7 @@ export function CollectionView({
     }
   };
   const chips = subChips(handle);
+  const brand = BRANDS.find((b) => b.handle === handle);
   const location = useLocation();
   const navigate = useNavigate();
   const navigation = useNavigation();
@@ -124,16 +126,23 @@ export function CollectionView({
           <nav className="crumbs" aria-label="Fil d’Ariane">
             <Link to="/">Accueil</Link>
             <span>/</span>
-            <Link to="/collections">Collections</Link>
+            <Link to={brand ? '/marques' : '/collections'}>
+              {brand ? 'Marques' : 'Collections'}
+            </Link>
             <span>/</span>
             <span aria-current="page">{title}</span>
           </nav>
           <div className="plp-hero-row">
             <div>
-              <p className="eyebrow">{eyebrow}</p>
+              {brand?.logo ? (
+                <img src={brand.logo} alt="" className="plp-brand-logo" />
+              ) : null}
+              <p className="eyebrow">{brand ? 'Marque' : eyebrow}</p>
               <h1 className="display-xl">{title}</h1>
             </div>
-            {description ? <p className="plp-desc">{description}</p> : null}
+            {description || brand?.tagline ? (
+              <p className="plp-desc">{description || brand?.tagline}</p>
+            ) : null}
           </div>
           {chips.length ? (
             <div className="chip-row plp-chips">

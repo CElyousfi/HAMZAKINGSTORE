@@ -178,18 +178,24 @@ function SearchAside() {
                   </div>
                   <div className="search-block">
                     <p className="eyebrow">Marques</p>
-                    <div className="chip-row">
+                    <ul className="logo-grid logo-grid--search" role="list">
                       {BRANDS.map((b) => (
-                        <Link
-                          key={b.handle}
-                          className="chip"
-                          to={`/collections/${b.handle}`}
-                          onClick={closeSearch}
-                        >
-                          {b.name}
-                        </Link>
+                        <li key={b.handle}>
+                          <Link
+                            className="logo-tile"
+                            to={`/collections/${b.handle}`}
+                            onClick={closeSearch}
+                            aria-label={b.name}
+                          >
+                            {b.logo ? (
+                              <img src={b.logo} alt="" loading="lazy" />
+                            ) : (
+                              <span>{b.name}</span>
+                            )}
+                          </Link>
+                        </li>
                       ))}
-                    </div>
+                    </ul>
                   </div>
                 </div>
               );
@@ -291,6 +297,48 @@ function MobileMenuAside() {
               </Link>
             );
           }
+          if (item.kind === 'brands') {
+            return (
+              <div
+                key={item.label}
+                className={`mnav-group ${isOpen ? 'is-open' : ''}`}
+              >
+                <button
+                  className="mnav-row"
+                  aria-expanded={isOpen}
+                  onClick={() => setOpenIdx(isOpen ? null : i)}
+                >
+                  {item.label}
+                  <IconChevron width={18} height={18} />
+                </button>
+                <div className="mnav-sub">
+                  <div>
+                    <ul className="logo-grid logo-grid--3" role="list">
+                      {BRANDS.map((b) => (
+                        <li key={b.handle}>
+                          <Link
+                            to={`/collections/${b.handle}`}
+                            onClick={close}
+                            className="logo-tile"
+                            aria-label={b.name}
+                          >
+                            {b.logo ? (
+                              <img src={b.logo} alt="" loading="lazy" />
+                            ) : (
+                              <span>{b.name}</span>
+                            )}
+                          </Link>
+                        </li>
+                      ))}
+                    </ul>
+                    <Link to="/marques" onClick={close} className="mnav-all">
+                      Toutes les marques
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            );
+          }
           return (
             <div
               key={item.label}
@@ -328,18 +376,28 @@ function MobileMenuAside() {
         })}
       </nav>
       <div className="mnav-brands">
-        <p className="eyebrow">Marques</p>
+        <p className="eyebrow">Accès rapide</p>
         <div className="chip-row">
-          {BRANDS.map((b) => (
-            <Link
-              key={b.handle}
-              to={`/collections/${b.handle}`}
-              className="chip"
-              onClick={close}
-            >
-              {b.name}
-            </Link>
-          ))}
+          <Link
+            to="/collections/all?sort=newest"
+            className="chip"
+            onClick={close}
+          >
+            Nouveautés
+          </Link>
+          <Link
+            to="/collections/all?sort=best-selling"
+            className="chip"
+            onClick={close}
+          >
+            Best-sellers
+          </Link>
+          <Link to="/collections/promo" className="chip" onClick={close}>
+            Promos
+          </Link>
+          <Link to="/pages/guide-des-tailles" className="chip" onClick={close}>
+            Guide des tailles
+          </Link>
         </div>
       </div>
       <div className="mnav-links">

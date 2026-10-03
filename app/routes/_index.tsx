@@ -501,8 +501,8 @@ function BrandIndex() {
             Les marques.
           </h2>
         </div>
-        <Link to="/collections" className="link-arrow">
-          Toutes les collections <IconArrow width={16} height={16} />
+        <Link to="/marques" className="link-arrow">
+          Toutes les marques <IconArrow width={16} height={16} />
         </Link>
       </header>
       <ul className="brand-list">

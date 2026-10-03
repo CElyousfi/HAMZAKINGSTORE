@@ -3334,7 +3334,8 @@ body:has(.consent) .wa-float {
   }
 }
 .wishlist-head {
-  padding: 36px 0 24px;
+  padding-top: 36px;
+  padding-bottom: 24px;
 }
 .wishlist-actions {
   display: flex;
@@ -3656,7 +3657,8 @@ body:has(.consent) .wa-float {
   align-items: baseline;
 }
 .search-head {
-  padding: 36px 0 24px;
+  padding-top: 36px;
+  padding-bottom: 24px;
   display: grid;
   gap: 12px;
 }
@@ -3946,7 +3948,8 @@ body:has(.consent) .wa-float {
 
 /* ---------- Cart v2 ---------- */
 .cart-page-head {
-  padding: 36px 0 24px;
+  padding-top: 36px;
+  padding-bottom: 24px;
 }
 .upsell {
   padding: 20px 24px;
@@ -3984,7 +3987,8 @@ body:has(.consent) .wa-float {
 
 /* ---------- Pages ---------- */
 .page-head {
-  padding: 24px 0 36px;
+  padding-top: 24px;
+  padding-bottom: 36px;
   display: grid;
   gap: 14px;
 }
@@ -4448,5 +4452,470 @@ body:has(.consent) .wa-float {
   }
   .search-field .btn {
     flex: 1 1 100%;
+  }
+}
+
+/* =========================================================================
+   Brands — mega panel, logo grids, /marques page
+   ========================================================================= */
+
+/* Logos are black PNGs: keep them crisp and consistent */
+.bmega-logo,
+.logo-tile img,
+.brand-card-logo img,
+.plp-brand-logo {
+  width: auto;
+  object-fit: contain;
+}
+
+/* ---------- Mega panel ---------- */
+.bmega {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 420px;
+  gap: 40px;
+  max-width: var(--max);
+  margin-inline: auto;
+  padding: 32px var(--gutter) 40px;
+}
+.bmega-head {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.bmega-head .mega-title {
+  margin-bottom: 0;
+}
+.bmega-head .link-arrow {
+  font-size: 13px;
+}
+.bmega-grid {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 8px;
+}
+.bmega-tile {
+  position: relative;
+  display: grid;
+  place-items: center;
+  height: 96px;
+  padding: 18px 16px 26px;
+  background: var(--bone);
+  border: 1px solid transparent;
+  transition:
+    background 0.25s var(--ease),
+    border-color 0.25s var(--ease),
+    transform 0.35s var(--ease-out);
+  opacity: 0;
+  transform: translateY(8px);
+}
+.mega.is-open .bmega-tile {
+  opacity: 1;
+  transform: none;
+  transition:
+    opacity 0.45s var(--ease-out),
+    transform 0.5s var(--ease-out),
+    background 0.25s var(--ease),
+    border-color 0.25s var(--ease);
+}
+.mega.is-open .bmega-grid li:nth-child(2) .bmega-tile { transition-delay: 0.02s, 0.02s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(3) .bmega-tile { transition-delay: 0.04s, 0.04s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(4) .bmega-tile { transition-delay: 0.06s, 0.06s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(5) .bmega-tile { transition-delay: 0.08s, 0.08s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(6) .bmega-tile { transition-delay: 0.1s, 0.1s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(7) .bmega-tile { transition-delay: 0.12s, 0.12s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(8) .bmega-tile { transition-delay: 0.14s, 0.14s, 0s, 0s; }
+.mega.is-open .bmega-grid li:nth-child(n + 9) .bmega-tile { transition-delay: 0.16s, 0.16s, 0s, 0s; }
+.bmega-logo {
+  max-height: 34px;
+  max-width: 78%;
+  transition: transform 0.35s var(--ease-out);
+}
+.bmega-word {
+  font-family: var(--font-display);
+  font-stretch: 80%;
+  font-weight: 800;
+  font-size: 20px;
+  text-transform: uppercase;
+}
+.bmega-name {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 8px;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--ash);
+}
+.bmega-tile:hover,
+.bmega-tile.is-active {
+  background: var(--paper);
+  border-color: var(--ink);
+}
+.bmega-tile:hover .bmega-logo,
+.bmega-tile.is-active .bmega-logo {
+  transform: scale(1.06);
+}
+.bmega-tile.is-active .bmega-name {
+  color: var(--ink);
+}
+
+.bmega-preview {
+  display: grid;
+  grid-template-rows: auto 1fr;
+  gap: 16px;
+}
+.bmega-visual {
+  position: relative;
+  display: block;
+  aspect-ratio: 16 / 10;
+  background: var(--ink);
+  overflow: hidden;
+}
+.bmega-visual-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  animation: bmega-in 0.6s var(--ease-out) both;
+}
+@keyframes bmega-in {
+  from {
+    opacity: 0;
+    transform: scale(1.05);
+  }
+}
+.bmega-visual::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, transparent 45%, rgb(18 16 14 / 0.65));
+}
+.bmega-visual-empty {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: var(--stone);
+}
+.bmega-visual-empty img {
+  max-height: 64px;
+  max-width: 50%;
+  opacity: 0.85;
+}
+.bmega-visual-cta {
+  position: absolute;
+  left: 16px;
+  bottom: 14px;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--paper);
+  font-size: 13px;
+  font-weight: 600;
+}
+.bmega-visual:hover .bmega-visual-cta svg {
+  transform: translateX(4px);
+}
+.bmega-visual-cta svg {
+  transition: transform 0.3s var(--ease-out);
+}
+.bmega-info-name {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 30px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.bmega-info-tag {
+  margin-top: 6px;
+  font-size: 14px;
+  color: var(--ash);
+}
+.bmega-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 14px;
+}
+.bmega-links a {
+  display: inline-flex;
+  align-items: center;
+  height: 32px;
+  padding: 0 12px;
+  border: 1px solid var(--line-2);
+  border-radius: 99px;
+  font-size: 12px;
+  transition: all 0.2s;
+}
+.bmega-links a:hover {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+/* ---------- Reusable logo grid (mobile menu, search) ---------- */
+.logo-grid {
+  list-style: none;
+  display: grid;
+  gap: 6px;
+}
+.logo-grid--3 {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  padding-bottom: 8px;
+}
+.logo-grid--search {
+  grid-template-columns: repeat(auto-fill, minmax(110px, 1fr));
+}
+.logo-tile {
+  display: grid;
+  place-items: center;
+  height: 64px;
+  padding: 12px;
+  background: var(--bone);
+  border: 1px solid transparent;
+  transition:
+    background 0.2s,
+    border-color 0.2s;
+}
+.logo-tile img {
+  max-height: 26px;
+  max-width: 80%;
+}
+.logo-tile span {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 14px;
+  text-transform: uppercase;
+}
+.logo-tile:hover,
+.logo-tile:focus-visible {
+  background: var(--paper);
+  border-color: var(--ink);
+}
+.mnav-sub .logo-grid {
+  margin-top: 4px;
+}
+.mnav-sub .mnav-all {
+  padding-top: 12px;
+}
+
+/* ---------- Brand collection hero logo ---------- */
+.plp-brand-logo {
+  display: block;
+  max-height: 48px;
+  max-width: 180px;
+  margin-bottom: 18px;
+}
+.plp-hero--image .plp-brand-logo {
+  filter: invert(1);
+}
+
+/* ---------- /marques page ---------- */
+.brands-head-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-top: 12px;
+}
+.brands-search {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: min(360px, 100%);
+  height: 48px;
+  padding: 0 16px;
+  background: var(--stone);
+  border-radius: 99px;
+  color: var(--ash);
+}
+.brands-search input {
+  flex: 1;
+  min-width: 0;
+  border: 0;
+  outline: 0;
+  background: none;
+  font-size: 15px;
+  color: var(--ink);
+}
+.brand-cards {
+  list-style: none;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 32px 12px;
+  padding-bottom: 72px;
+}
+.brand-card {
+  display: grid;
+  gap: 14px;
+}
+.brand-card-visual {
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  background: var(--stone);
+  overflow: hidden;
+}
+.brand-card-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transform: scale(1.04);
+  transition:
+    opacity 0.5s var(--ease),
+    transform 1s var(--ease-out);
+}
+.brand-card-logo {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  transition:
+    opacity 0.4s var(--ease),
+    transform 0.6s var(--ease-out);
+}
+.brand-card-logo img {
+  max-height: 56px;
+  max-width: 55%;
+}
+.brand-card-logo span {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 32px;
+  text-transform: uppercase;
+}
+@media (hover: hover) {
+  .brand-card:hover .brand-card-img {
+    opacity: 1;
+    transform: none;
+  }
+  .brand-card:hover .brand-card-logo {
+    opacity: 0;
+    transform: scale(0.94);
+  }
+}
+.brand-card-name {
+  font-family: var(--font-display);
+  font-stretch: 78%;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+  text-transform: uppercase;
+}
+.brand-card-tag {
+  font-size: 14px;
+  color: var(--ash);
+  margin-top: -6px;
+}
+.brand-card-links {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+.brand-card-links .chip {
+  height: 30px;
+  font-size: 12px;
+  padding: 0 11px;
+}
+.brand-card .link-arrow {
+  justify-self: start;
+  font-size: 13px;
+}
+.brands-empty {
+  display: grid;
+  justify-items: start;
+  gap: 16px;
+  padding: 24px 0 80px;
+}
+.brands-az {
+  padding: 40px var(--gutter) 96px;
+  border-top: 1px solid var(--line);
+}
+.brands-az-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 24px 32px;
+}
+.brands-az-group {
+  display: grid;
+  grid-template-columns: 32px 1fr;
+  gap: 8px;
+}
+.brands-az-letter {
+  font-family: var(--font-display);
+  font-stretch: 75%;
+  font-weight: 800;
+  font-size: 24px;
+  line-height: 1;
+}
+.brands-az-group ul {
+  list-style: none;
+}
+.brands-az-group a {
+  display: inline-block;
+  padding: 2px 0;
+  font-size: 14px;
+}
+.brands-az-group a:hover {
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 87.5em) {
+  .bmega {
+    grid-template-columns: minmax(0, 1fr) 340px;
+  }
+}
+@media (max-width: 63.99em) {
+  .brand-cards {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+  .brands-head-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .brands-search {
+    width: 100%;
+  }
+}
+@media (max-width: 44.99em) {
+  .brand-cards {
+    gap: 28px 8px;
+  }
+  .brand-card-name {
+    font-size: 20px;
+  }
+  .brand-card-links {
+    display: none;
+  }
+  .logo-grid--search {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 63.99em) {
+  .hide-md {
+    display: none !important;
+  }
+}
+.brand-card-tag {
+  margin-top: 0;
+}
+@media (max-width: 63.99em) {
+  .announce-track {
+    grid-column: 1;
   }
 }
