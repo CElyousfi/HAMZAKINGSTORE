@@ -21,7 +21,17 @@ Warm monochrome design, French copy, prices in DH, cash-on-delivery messaging, W
 
 ## Shopify setup checklist
 1. **Products**: give each sneaker one option named `Pointure` (or `Size`) with EU sizes. Vendor = brand.
-2. **Collections** (handles must match): `all` (automated, every product), `homme`, `femme`, `enfant`, `promo`, `running`, `lifestyle`, `basketball`, `outdoor`, and one per brand (`nike`, `adidas`, `new-balance`, …).
+2. **Collections**: already created as smart collections, so products sort themselves. Just set the **vendor** to the brand and add **tags**:
+
+| Tag | Puts the product in |
+|---|---|
+| `homme` / `femme` / `enfant` / `bebe` / `junior` | Homme, Femme, Enfant, Bébé, Junior |
+| `running` / `lifestyle` / `basketball` / `outdoor` | the category (and e.g. `homme` + `running` → Homme Running) |
+| `plateforme` (with `femme`) | Femme Plateformes |
+| `new` | "Nouveau" badge |
+| `restock` / `limited` | Retour en stock / Éditions limitées |
+
+   A "compare-at" price puts it in **Promo** automatically. Vendor `Nike`, `Jordan`, `Adidas`, `New Balance`, `Asics`, `Puma`, `On`, `Hoka`, `Converse` or `Vans` puts it in that brand's collection.
 3. **Filters**: install *Shopify Search & Discovery* and enable Availability, Price, Vendor, and the `Pointure` / `Couleur` options.
 4. **Markets**: enable Morocco with MAD currency.
 5. **Payments**: enable *Cash on Delivery (COD)* under manual payment methods.
